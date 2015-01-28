@@ -1,0 +1,6 @@
+[{"children":[
+{"children":[],"component":"","description":"","iconCls":"","id":2,"leaf":true,"parentId":1,"sort":0,"text":"节点-1","type":"URL","url":""},
+{"children":[],"component":"","description":"","iconCls":"","id":3,"leaf":true,"parentId":1,"sort":0,"text":"节点-2","type":"URL","url":""},
+{"children":[],"component":"","description":"","iconCls":"","id":4,"leaf":true,"parentId":1,"sort":0,"text":"节点-3","type":"URL","url":""},
+{"children":[],"component":"","description":"","iconCls":"","id":5,"leaf":true,"parentId":1,"sort":0,"text":"节点-4","type":"URL","url":""}
+],"component":"","description":"","iconCls":"","id":1,"leaf":false,"parentId":0,"sort":0,"text":"树根","type":"COMPONENT","url":"123"}]

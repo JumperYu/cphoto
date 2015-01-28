@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/jdbc 
+       http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/data/jpa 
+       http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.cp" />
+
+	<!-- 全注解方式集成事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<!-- <property name="ignoreResourceNotFound" value="true" /> -->
+		<property name="locations" value="classpath*:config/props/jdbc.properties" />
+	</bean>
+
+	<!-- bean below allows multipart upload -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes -->
+		<property name="maxUploadSize" value="20000000" />
+	</bean>
+
+	<!-- 数据源 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+		<property name="jndiName"> <value>java:comp/env/jdbc/cphoto</value> </property> 
+		</bean> -->
+
+	<!-- ORM 框架 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+
+	<!-- Jpa Entity Manager 配置 -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+		<property name="packagesToScan" value="com.cp" />
+		<property name="jpaDialect" ref="jpaDialect" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory 
+					</prop> <prop key="net.sf.ehcache.configurationResourceName">config/ehcache-hibernate-local.xml</prop> -->
+			</props>
+		</property>
+	</bean>
+
+	<bean id="persistenceProvider" class="org.hibernate.jpa.HibernatePersistenceProvider" />
+
+	<bean id="jpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+	</bean>
+
+	<bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	<!-- end ORM -->
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<!-- 事物 -->
+	<!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+		<property name="dataSource" ref="dataSource" /> </bean> -->
+
+	<!-- 定义事务通知 <tx:advice id="txAdvice" transaction-manager="transactionManager"> 
+		<tx:attributes> <tx:method name="*" propagation="REQUIRED"/> <tx:method name="login" 
+		read-only="true" /> </tx:attributes> </tx:advice> -->
+	<!-- 定义AOP配置 <aop:config> <aop:pointcut expression="execution (* com.cp.user.service.*.*(..))" 
+		id="service" /> <aop:advisor advice-ref="txAdvice" pointcut-ref="service" 
+		/> </aop:config> -->
+	<!-- spymemcached -->
+	<!-- <bean id="memcachedClient" class="net.spy.memcached.spring.MemcachedClientFactoryBean"> 
+		<property name="servers" value="host1:11211,host2:11211,host3:11211" /> <property 
+		name="protocol" value="BINARY" /> <property name="transcoder"> <bean class="net.spy.memcached.transcoders.SerializingTranscoder"> 
+		<property name="compressionThreshold" value="1024" /> </bean> </property> 
+		<property name="opTimeout" value="1000" /> <property name="timeoutExceptionThreshold" 
+		value="1998" /> <property name="hashAlg" value="KETAMA_HASH" /> <property 
+		name="locatorType" value="CONSISTENT" /> <property name="failureMode" value="Redistribute" 
+		/> <property name="useNagleAlgorithm" value="false" /> </bean> -->
+</beans>
