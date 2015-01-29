@@ -1,5 +1,6 @@
 package com.cp.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,13 +12,14 @@ import java.util.Date;
  * 
  */
 public class DateUtils {
-	
+
 	public static void main(String[] args) {
-		//System.out.println(DateUtils.getStartDate(-1));
-		//System.out.println(DateUtils.getEndDate(-1));
-		System.out.println(DateUtils.getDateStr("YYYYMMdd HH:mm:ss"));
+		// System.out.println(DateUtils.getStartDate(-1));
+		// System.out.println(DateUtils.getEndDate(-1));
+		// System.out.println(DateUtils.getDateStr("YYYYMMdd HH:mm:ss"));
+		System.out.println(DateUtils.strToTime("2010-01-01 00:00:00"));
 	}
-	
+
 	/**
 	 * 获取偏移当前天的开始时间 如 2015-01-05 00:00:00
 	 * 
@@ -52,16 +54,46 @@ public class DateUtils {
 		return todayEnd.getTime();
 	}
 
-	//------------->> 以下获取时间的格式化字符串
-	
+	// ------------->> 以下获取时间的格式化字符串
+
 	/**
 	 * 获取当天的格式化时间
 	 * 
-	 * @param pattern YYYMMdd HH:mm:ss
+	 * @param pattern
+	 *            YYYMMdd HH:mm:ss
 	 * @return String
 	 */
 	public static String getDateStr(String pattern) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		return sdf.format(new Date());
+	}
+
+	/**
+	 * 字符串转时间
+	 * 
+	 * @param time 时间字符串
+	 * @return
+	 * @throws ParseException
+	 */
+	public static Date strToTime(String time) {
+		return strToTime(time, "YYYY-MM-dd HH:mm:ss");
+	}
+
+	/**
+	 * 字符串转时间
+	 * 
+	 * @param time	      时间
+	 * @param pattern 格式	
+	 * @return
+	 * @throws ParseException
+	 */
+	public static Date strToTime(String time, String pattern) {
+		Date date = null;
+		try {
+			date = new SimpleDateFormat(pattern).parse(time);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
 	}
 }

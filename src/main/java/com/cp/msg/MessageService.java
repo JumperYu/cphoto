@@ -16,6 +16,9 @@ import com.cp.entity.Message;
 @Service
 public class MessageService extends BaseService {
 
+	private static final String REQ_MSG = "select b.msgid,b.eventid, a.nickname,a.userid,a.sex from cp_account a, push_msg b"
+			+ " where a.userid=b.ori_userid and b.eventid=? and b.tar_userid=? and b.state=?";
+
 	/**
 	 * 长轮询获取事件
 	 * 
@@ -43,9 +46,9 @@ public class MessageService extends BaseService {
 	}
 
 	public List<Message> getMsg(int eventid, int userid) {
-		String sql = "select b.msgid,b.eventid, a.cp_nickname,a.cp_userid,a.cp_gender from cp_identity a, push_msg b"
-				+ " where a.cp_userid=b.ori_userid and b.eventid=? and b.tar_userid=? and b.state=?";
-		return getBaseDAO().getJdbcTemplate().query(sql,
+	/*	String sql = "select b.msgid,b.eventid, a.cp_nickname,a.cp_userid,a.cp_gender from cp_identity a, push_msg b"
+				+ " where a.cp_userid=b.ori_userid and b.eventid=? and b.tar_userid=? and b.state=?";*/
+		return getBaseDAO().getJdbcTemplate().query(REQ_MSG,
 				new Object[] { eventid, userid, PushMessage.WAIT_STATE },
 				new RowMapper<Message>() {
 					@Override
@@ -67,11 +70,15 @@ public class MessageService extends BaseService {
 	/**
 	 * 添加一条请求添加好友的推送
 	 * 
-	 * @param userid		请求者id	
-	 * @param tar_userid	接收者id
-	 * @param remark		备注
-	 * @param eventForFriendAsking	事件id
-	 * @return int  1 成功插入 -1 插入失败
+	 * @param userid
+	 *            请求者id
+	 * @param tar_userid
+	 *            接收者id
+	 * @param remark
+	 *            备注
+	 * @param eventForFriendAsking
+	 *            事件id
+	 * @return int 1 成功插入 -1 插入失败
 	 */
 	public int addPushMsg(int userid, int tar_userid, String remark,
 			int eventForFriendAsking) {
@@ -80,8 +87,8 @@ public class MessageService extends BaseService {
 				tar_userid, remark);
 		return ret > 0 ? 1 : -1;
 	}
-	
-	public int updateMsg(int msgid, int userid, int state){
+
+	public int updateMsg(int msgid, int userid, int state) {
 		String sql = "update push_msg set state=? where msgid=? and tar_userid=?";
 		int ret = getBaseDAO().update(sql, state, msgid, userid);
 		return ret;

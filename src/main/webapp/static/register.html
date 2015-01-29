@@ -18,7 +18,7 @@
 			bodyPadding : 5,
 			width : 350,
 			// The form will submit an AJAX request to this URL when submitted
-			url : 'http://localhost/v2_1/register',
+			url : '/v2_1/register',
 
 			// Fields will be arranged vertically, stretched to full width
 			layout : 'anchor',
@@ -36,10 +36,12 @@
 				fieldLabel : 'password',
 				name : 'password',
 				inputType : 'password',
+				value : '123',
 				allowBlank : false
 			} , {
 				fieldLabel : 'nickname',
 				name : 'nickname',
+				value : '小鱼',
 				allowBlank : false
 			},  {
 	            xtype      : 'fieldcontainer',
@@ -65,14 +67,17 @@
 	        }, {
 				fieldLabel : 'age',
 				name : 'age',
-				allowBlank : false
+				allowBlank : false,
+				value : '25'
 			}, {
 				fieldLabel : 'email',
 				name : 'email',
+				value : 'previous_yu@163.com',
 				allowBlank : false
 			}, {
 				fieldLabel : 'telphone',
 				name : 'telphone',
+				value : '15917438010',
 				allowBlank : false
 			}],
 
@@ -92,6 +97,7 @@
 						form.submit({
 							success : function(form, action) {
 								Ext.Msg.alert('Success', action.result.msg);
+								window.location.href = "index.html";
 							},
 							failure : function(form, action) {
 								Ext.Msg.alert('Failed', action.result.msg);

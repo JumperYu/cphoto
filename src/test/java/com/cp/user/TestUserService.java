@@ -22,17 +22,18 @@ public class TestUserService {
 	@Autowired
 	private PhotoService photoService;
 	
-	@Test
+	//@Test
 	public void testZhongwen(){
 		userService.getBaseDAO().insert("insert into temp1 values('中文')");
 		userService.getBaseDAO().insert("insert into temp2 values('中文')");
 	}
 
-	@Test
+	//@Test
 	public void testUserRegister() {
 		String cphoto = ""
 				+ (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 100);
-		String account = "mytest_" + Math.round(Math.random() * 1000);
+//		String account = "mytest_" + Math.round(Math.random() * 1000);
+		String account = "xiaoyu";
 		String password = "123";
 		String nickname = "小雨";
 		String gender = "x";
@@ -45,42 +46,42 @@ public class TestUserService {
 
 	@Test
 	public void testUserLogin() {
-		String account = "mytest_112";
+		String account = "xiaoyu";
 		String pwd = "123";
 		System.out.println(userService.login(account, pwd));
 	}
 
-	@Test
+	//@Test
 	public void testListPics() {
 		String cphoto = "1417231971";
 		System.out.println(photoService.findAllPics(cphoto));
 	}
 
-	@Test
+	////@Test
 	public void testAddFriend() {
 /*		userService.addFriend("1417231971", "1417236064", "1", "组-1");
 		userService.addFriend("1417231971", "1417236714", "1", "组-1");*/
 		userService.addFriend("1417231971", "1417244641", "1", "组-1");
 	}
 
-	@Test
+	//@Test
 	public void testGetFriends() {
 //		System.out.println(userService.getFriendsArry("1417231971"));
 		System.out.println(userService.getFriends(1417231971));
 	}
 	
-	@Test
+	//@Test
 	public void testGetUsers() {
 //		System.out.println(userService.getFriendsArry("1417231971"));
 		System.out.println(userService.findUsersBy("123", 1417231971));
 	}
 
-	@Test   
+	//@Test   
 	public void testGetGroups() {
 		System.out.println(userService.getGroups("1417231971", "", ""));
 	}
 	
-/*	@Test   
+/*	//@Test   
 	public void testPushMsg() {
 		System.out.println(userService.getPushMsg(1417248218));
 	}*/
@@ -90,7 +91,7 @@ public class TestUserService {
 		userService.addPushMsg("1417231971", "1417236064", PushMessage.EVENT_FOR_FRIEND_ASKING);
 	}
 	
-	@Test
+	//@Test
 	public void testGetUserid(){
 		System.out.println(userService.findUserByUserid("1417231971"));
 	}

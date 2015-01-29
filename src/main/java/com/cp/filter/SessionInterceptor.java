@@ -73,14 +73,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 						JsonResponseUtil.formate(
 								MessageBox.Message.CP_SESSION_FAIL.getRet(),
 								MessageBox.Message.CP_SESSION_FAIL.getMsg()));
-			}// -->> end of if
-			/*
-			 * log.debug("redirect to login uri: " + LOGIN_URI); Object user =
-			 * request.getSession().getAttribute("uid"); if (user != null) {
-			 * flag = true; } else {
-			 * response.sendRedirect(request.getServletContext()
-			 * .getContextPath() + LOGIN_URI);
-			 */
+			}
 		}// -->> End of if
 		return flag;// -->> 如果return false 整个流程就结束了
 	}

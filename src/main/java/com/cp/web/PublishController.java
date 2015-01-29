@@ -42,9 +42,9 @@ public class PublishController {
 			.getLogger(PublishController.class);
 
 	// 图片资源地址
-	private static final String IMAGE_DOMAIN = "http://image.bradypod.com/";
+	private static final String IMAGE_DOMAIN = "http://image.bradypod.com/cphoto/";
 	// 硬盘根目录
-	private static final String DISK_UPLOAD_ROOT_DIR = "/pics/";
+	private static final String DISK_UPLOAD_ROOT_DIR = "/pics/cphoto/";
 
 	@Resource
 	private SubjectService subjectService;

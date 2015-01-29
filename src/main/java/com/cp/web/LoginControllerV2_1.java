@@ -28,7 +28,6 @@ import com.cp.cache.SpyClient;
 import com.cp.constant.MessageBox;
 import com.cp.constant.PushMessage;
 import com.cp.entity.Event;
-import com.cp.entity.Message;
 import com.cp.msg.MessageService;
 import com.cp.photo.service.PhotoService;
 import com.cp.user.service.UserService;
@@ -329,16 +328,6 @@ public class LoginControllerV2_1 {
 	}
 
 	// 搜索好友
-	@RequestMapping("/find_friends")
-	@ResponseBody
-	public Map<String, Object> searchFriends(int userid) {
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		modelMap.put("ret", 1);
-		modelMap.put("friends", userService.getFriends(userid));
-		return modelMap;
-	}
-
-	// 搜索好友
 	@RequestMapping("/friends")
 	@ResponseBody
 	public List<List<Object>> searchFriendsArray(
@@ -357,26 +346,6 @@ public class LoginControllerV2_1 {
 		}/*
 		 * else { modelMap.put("ret", 0); modelMap.put("events", null); }
 		 */
-		return modelMap;
-	}
-
-	// 轮询接口
-	@RequestMapping(value = "/req_msg")
-	@ResponseBody
-	public Map<String, Object> reqMsg(int eventid, int userid) {
-
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-
-		List<Message> msgs = messageService.getMsg(eventid, userid);
-		if (msgs != null && msgs.size() > 0) {
-			modelMap.put("ret", 1);
-			modelMap.put("msgs", msgs);
-			modelMap.put("eventid", eventid);
-		} else {
-			modelMap.put("ret", 0);
-			modelMap.put("msgs", null);
-			modelMap.put("eventid", eventid);
-		}
 		return modelMap;
 	}
 

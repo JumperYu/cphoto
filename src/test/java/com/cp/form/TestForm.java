@@ -40,73 +40,86 @@ public class TestForm {
 
 	private static String sessionid = "";
 	private static String userid = "";
-	private static String release_domain = "121.199.67.141";
-	private static String local_domain = "localhost:8080";
+	private static String release_domain = "http://121.199.67.141";
+	private static String local_domain = "http://localhost";
+
+	@Before
+	public void testLogin() {
+		String param = "account=xiaoyu&password=123";
+		String body = HttpRequestUtil.httpRequest("GET", release_domain
+				+ "/v2_1/login", param, null);
+		JSONObject jsb = new JSONObject(body);
+		sessionid = jsb.getJSONObject("session").getString("sessionid");
+		userid = jsb.getJSONObject("account").get("userid").toString();
+	}
 
 	@Test
-	public void testUpload() throws IOException {
+	public void testUpload() throws IOException, InterruptedException {
+		while (true) {
+			String targetURL = null; // -- 指定URL
 
-		String targetURL = null; // -- 指定URL
+			File targetFile = null; // -- 指定上传文件
 
-		File targetFile = null; // -- 指定上传文件
+			String filepath = "E:\\logo6.png";
+			String filename = "ok.jpg";
 
-		String filepath = "E:\\ok.jpg";
-		String filename = "ok.jpg";
+			targetURL = release_domain + "/v2_1/add_subject";
+			// targetURL = "http://localhost:8080/cphoto/v2_1/add_subject";
 
-		// targetURL = "http://121.199.67.141/v2/publish";
-		targetURL = "http://localhost:8080/cphoto/v2_1/add_subject";
+			CloseableHttpClient httpclient = HttpClients.createDefault();
 
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-
-		try {
-
-			targetFile = new File(filepath);
-
-			FileBody bin = new FileBody(targetFile, ContentType.create(
-					"multipart/form-data", Consts.UTF_8), filename);
-
-			StringBody title = new StringBody("标题", ContentType.create(
-					"text/plain", Consts.UTF_8));
-			StringBody content = new StringBody("内容", ContentType.create(
-					"text/plain", Consts.UTF_8));
-			StringBody cphoto = new StringBody(userid, ContentType.create(
-					"text/plain", Consts.UTF_8));
-
-			HttpPost httpPost = new HttpPost(targetURL);
-			// 以浏览器兼容模式运行,防止文件名乱码
-			HttpEntity reqEntity = MultipartEntityBuilder.create()
-					.setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-					.addPart("file", bin).addPart("title", title)
-					.addPart("content", content).addPart("userid", cphoto)
-					.setCharset(CharsetUtils.get("UTF-8")).build();
-
-			httpPost.setEntity(reqEntity);
-			httpPost.setHeader("cookie", "JSESSIONID=" + sessionid);
-
-			CloseableHttpResponse response = httpclient.execute(httpPost);
 			try {
-				System.out.println(response.getStatusLine());
-				HttpEntity resEntity = response.getEntity();
-				if (resEntity != null) {
-					System.out.println("Response content length: "
-							+ resEntity.getContentLength());
+
+				targetFile = new File(filepath);
+
+				FileBody bin = new FileBody(targetFile, ContentType.create(
+						"multipart/form-data", Consts.UTF_8), filename);
+
+				StringBody title = new StringBody("这是一个标题", ContentType.create(
+						"text/plain", Consts.UTF_8));
+				StringBody content = new StringBody("这是一个内容",
+						ContentType.create("text/plain", Consts.UTF_8));
+				StringBody cphoto = new StringBody(userid, ContentType.create(
+						"text/plain", Consts.UTF_8));
+
+				HttpPost httpPost = new HttpPost(targetURL);
+				// 以浏览器兼容模式运行,防止文件名乱码
+				HttpEntity reqEntity = MultipartEntityBuilder.create()
+						.setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+						.addPart("file", bin).addPart("title", title)
+						.addPart("content", content).addPart("userid", cphoto)
+						.setCharset(CharsetUtils.get("UTF-8")).build();
+
+				httpPost.setEntity(reqEntity);
+				httpPost.setHeader("cookie", "JSESSIONID=" + sessionid);
+
+				CloseableHttpResponse response = httpclient.execute(httpPost);
+				try {
+					System.out.println(response.getStatusLine());
+					HttpEntity resEntity = response.getEntity();
+					if (resEntity != null) {
+						System.out.println("Response: "
+								+ resEntity.getContentLength());
+					}
+					EntityUtils.consume(resEntity);
+				} finally {
+					response.close();
 				}
-				EntityUtils.consume(resEntity);
+
+			} catch (Exception ex) {
+
+				ex.printStackTrace();
+
 			} finally {
-				response.close();
+				httpclient.close();
 			}
-
-		} catch (Exception ex) {
-
-			ex.printStackTrace();
-
-		} finally {
-			httpclient.close();
+			// 缓缓
+			Thread.sleep(500);
 		}
 
 	}
 
-	@Test
+	// //@Test
 	public void testDownload() throws IOException {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -125,7 +138,7 @@ public class TestForm {
 		FileUtils.copyInputStreamToFile(in, new File("d://jaodan.jpg"));
 	}
 
-	@Test
+	// @Test
 	public void testMuzhiwan() throws IOException {
 
 		String targetURL = null; // -- 指定URL
@@ -187,7 +200,7 @@ public class TestForm {
 		HttpRequestUtil
 				.httpRequest("GET",
 						// "http://121.199.67.141/cphoto/v2/register",
-						"http://localhost:8080/cphoto/v2/register",
+						release_domain + "/v2_1/register",
 						String.format(
 								"account=%s&password=%s&nickname=%s&gender=%s&age=%s&email=%s&telphone=%s",
 								account, password,
@@ -195,7 +208,7 @@ public class TestForm {
 								age, email, telphone), null);
 	}
 
-	@Test
+	// @Test
 	public void testFind() throws UnsupportedEncodingException {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -234,21 +247,11 @@ public class TestForm {
 		 */
 	}
 
-	@Test
+	// @Test
 	public void sendBody() {
 		String body = "{\"sign\":\"d2221b8355a46287902026976d8db18b\",\"id\":1417505599240,\"data\":{\"amount\":100,\"callbackinfo\":\"\",\"failedDesc\":\"\",\"gameId\":\"752388\",\"grade\":\"6\",\"lwid\":143919,\"orderId\":\"ms_yilan_1_143919_1417504679\",\"orderStatus\":\"S\",\"payWay\":\"2\",\"roleId\":\"\",\"roleName\":\"\",\"sdkorderid\":\"20141202153258372\",\"serverId\":\"1\"}}";
 		HttpRequestUtil.httpRequest("GET",
 				"http://localhost:8080/mobile/yilan/payback", body, null);
-	}
-
-	@Before
-	public void testLogin() {
-		String param = "account=mytest_112&password=123";
-		String body = HttpRequestUtil.httpRequest("GET", "http://"
-				+ local_domain + "/cphoto/v2_1/login", param, null);
-		JSONObject jsb = new JSONObject(body);
-		sessionid = jsb.getJSONObject("session").getString("sessionid");
-		userid = jsb.getJSONObject("account").get("userid").toString();
 	}
 
 	@Test
@@ -256,11 +259,11 @@ public class TestForm {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
 		String param = "userid=" + userid;
-		HttpRequestUtil.httpRequest("GET", "http://" + release_domain
-				+ "/cphoto/v2_1/list_pics", param, headers);
+		HttpRequestUtil.httpRequest("GET", release_domain + "/v2_1/list_pics",
+				param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testToken() {
 		String param = "userid=1417231971&token=371b85af-8609-4ac7-8bb0-1";
 		HttpRequestUtil.httpRequest("GET",
@@ -272,11 +275,11 @@ public class TestForm {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
 		String param = "userid=" + userid;
-		HttpRequestUtil.httpRequest("GET", "http://" + local_domain
+		HttpRequestUtil.httpRequest("GET", "http://" + release_domain
 				+ "/cphoto/v2_1/list_subjects", param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testAddComment() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -289,7 +292,7 @@ public class TestForm {
 						headers);
 	}
 
-	@Test
+	// @Test
 	public void testEventMsg() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -298,7 +301,7 @@ public class TestForm {
 				+ "/cphoto/v2_1/long_poll", param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testGetMsg() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -307,7 +310,7 @@ public class TestForm {
 				+ "/cphoto/v2_1/req_msg", param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testAddFriend() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -317,7 +320,7 @@ public class TestForm {
 				"http://localhost:8080/cphoto/v2_1/add_friend", param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testConfirmMsg() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
@@ -326,7 +329,7 @@ public class TestForm {
 				+ "/cphoto/v2_1/confirm_msg", param, headers);
 	}
 
-	@Test
+	// @Test
 	public void testFindFriends() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);

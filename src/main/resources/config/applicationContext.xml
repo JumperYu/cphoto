@@ -25,10 +25,15 @@
 	<!-- 全注解方式集成事物 -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
-	<bean
+<!-- 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<!-- <property name="ignoreResourceNotFound" value="true" /> -->
+		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations" value="classpath*:config/props/jdbc.properties" />
+	</bean> -->
+	<bean
+		class="com.cp.utils.MyPropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations" value="classpath*:config/props/db.properties" />
 	</bean>
 
 	<!-- bean below allows multipart upload -->
@@ -41,10 +46,10 @@
 	<!-- 数据源 -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
+		<property name="driverClassName" value="${db.class}" />
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.user}" />
+		<property name="password" value="${db.identity}" />
 	</bean>
 
 	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 

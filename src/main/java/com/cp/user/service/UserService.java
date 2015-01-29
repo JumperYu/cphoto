@@ -27,9 +27,14 @@ public class UserService extends BaseService {
 	 * .getLogger(UserService.class);
 	 */
 
-	private static final String LOGIN_SQL = "select a.cp_userid, b.cp_userid as userid, cp_account, cp_nickname, cp_gender, cp_age, cp_email, cp_telphone from cp_user a, cp_identity b where a.cp_userid=b.cp_userid and a.cp_account=? and a.cp_pwd=?";
-	private static final String REGISTER_USER_SQL = "insert into cp_user(cp_userid, cp_account, cp_pwd) values(?, ?, ?)";
-	private static final String REGISTER_IDENTITY_SQL = "insert into cp_identity(cp_nickname, cp_gender,cp_age,cp_email,cp_telphone,cp_userid) values(?, ?, ?, ?, ?, ?)";
+	private static final String LOGIN_SQL = "select id, nickname, sex, age, email, telphone, userid, account, `password` from cp_account where account=? and `password`=?";
+	private static final String REGISTER_USER_SQL = "insert into cp_account(nickname, sex, age, email, telphone, userid, account, `password`) values(?,?,?,?,?,?,?,?)";
+	private static final String FIND_FRIENDS = "select id, nickname, sex, age, email, telphone, t1.userid, account, `password` from cp_account t1, cp_friendship t2 where t1.userid=t2.cp_relatedid and t2.cp_userid=?";
+
+	// private static final String REGISTER_USER_SQL =
+	// "insert into cp_user(cp_userid, cp_account, cp_pwd) values(?, ?, ?)";
+	// private static final String REGISTER_IDENTITY_SQL =
+	// "insert into cp_identity(cp_nickname, cp_gender,cp_age,cp_email,cp_telphone,cp_userid) values(?, ?, ?, ?, ?, ?)";
 
 	/**
 	 * 查询账号唯一性
@@ -39,7 +44,7 @@ public class UserService extends BaseService {
 	 * @return 存在 true, 不存在 false
 	 */
 	public boolean isAccountExits(String account) {
-		String sql = "select count(1) from cp_user where cp_account=?";
+		String sql = "select count(1) from cp_account where account=?";
 		int count = getBaseDAO().findIntBySql(sql, account);
 		if (count >= 1)
 			return true;
@@ -57,7 +62,7 @@ public class UserService extends BaseService {
 	 */
 	public boolean validate(String account, String password) {
 
-		String sql = "select count(1) from cp_user where cp_account=? and cp_pwd=?";
+		String sql = "select count(1) from cp_account where account=? and `password`=?";
 
 		int count = getBaseDAO().findIntBySql(sql, account, password);
 
@@ -131,11 +136,9 @@ public class UserService extends BaseService {
 	public void register(String userid, String account, String password,
 			String nickname, String gender, String age, String email,
 			String telphone) {
-		getBaseDAO().getJdbcTemplate().execute("set names gbk");
-		getBaseDAO().insert(REGISTER_USER_SQL, userid, account, password);
-		getBaseDAO().insert(REGISTER_IDENTITY_SQL, nickname, gender, age,
-				email, telphone, userid);
-		addGroup(userid, "1", "default");// every one got the default group
+		getBaseDAO().insert(REGISTER_USER_SQL, nickname, gender, age, email,
+				telphone, userid, account, password);
+		// addGroup(userid, "1", "default");// every one got the default group
 	}
 
 	/**
@@ -166,12 +169,7 @@ public class UserService extends BaseService {
 	 * @return List<Map<String, Object>>
 	 */
 	public List<Map<String, Object>> getFriends(int userid) {
-		String sql = "select a.cp_userid , c.cp_nickname, c.cp_gender"
-				+ " from cp_user a, cp_friendship b, cp_identity c"
-				+ " where b.cp_userid=?" + " and a.cp_userid=b.cp_relatedid"
-				+ " and a.cp_userid=c.cp_userid"
-				+ " and b.cp_relatedid=c.cp_userid";
-		return getBaseDAO().queryForList(sql, userid);
+		return getBaseDAO().queryForList(FIND_FRIENDS, userid);
 	}
 
 	/**

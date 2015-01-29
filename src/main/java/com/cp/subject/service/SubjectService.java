@@ -34,7 +34,7 @@ public class SubjectService extends BaseService {
 	 * @return int id
 	 */
 	public int addSubject(String title, String content, int photoid, int userid) {
-		String sql = "insert into cp_subject(title,content,photoid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
+		String sql = "insert into cp_subject(title,content,pictureid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
 		int id = getBaseDAO().insert(sql, title, content, photoid, userid);
 		return id;
 	}
@@ -56,7 +56,7 @@ public class SubjectService extends BaseService {
 	 */
 	public int addReply(String title, String content, int picId, int userid,
 			String subjectid) {
-		String sql = "insert into cp_reply(title,content,photoid,userid,subjectid,create_time,update_time) values(?,?,?,?,?,now(),now())";
+		String sql = "insert into cp_reply(title,content,pictureid,userid,subjectid,create_time,update_time) values(?,?,?,?,?,now(),now())";
 		int id = getBaseDAO().insert(sql, title, content, picId, userid,
 				subjectid);
 		return id;

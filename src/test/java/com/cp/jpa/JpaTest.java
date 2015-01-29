@@ -3,9 +3,7 @@ package com.cp.jpa;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,7 +23,7 @@ public class JpaTest {
 	@Resource
 	private ApplicationDAO applicationDAO;
 
-	@Test
+	//@Test
 	public void testCRUD() {
 		Application app = applicationDAO.get("10001");
 		System.out.println(app);
@@ -55,14 +53,14 @@ public class JpaTest {
 		 */
 	}
 
-	@Test
+	//@Test
 	public void testUpdate() {
 		Application app = applicationDAO.get("10001");
 		app.setHtml("http://localhost:8080/cphoto/static/user.html");
 		applicationDAO.update(app);
 	}
 
-	@Test
+	//@Test
 	public void testSave() {
 		//Application root = applicationDAO.get("1001");
 		//em.getTransaction().begin();
