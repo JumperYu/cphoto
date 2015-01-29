@@ -265,18 +265,6 @@ public class LoginControllerV2_1 {
 		return modelMap;
 	}
 
-	// 请求添加
-	@RequestMapping(value = "/add_friend")
-	@ResponseBody
-	public Map<String, Object> addFriend(int userid, int tar_userid,
-			String remark) {
-		int ret = messageService.addPushMsg(userid, tar_userid, remark,
-				PushMessage.EVENT_FOR_FRIEND_ASKING);
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		modelMap.put("ret", ret);
-		modelMap.put("msg", "added msg.");
-		return modelMap;
-	}
 
 	// 搜索ren
 	@RequestMapping(value = "/find_user")
@@ -285,16 +273,6 @@ public class LoginControllerV2_1 {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		modelMap.put("ret", 1);
 		modelMap.put("info", userService.findUserByUserid(userid));
-		return modelMap;
-	}
-
-	// 搜索人
-	@RequestMapping(value = "/find_users")
-	@ResponseBody
-	public Map<String, Object> searchUsers(String nickname, int userid) {
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		modelMap.put("ret", 1);
-		modelMap.put("info", userService.findUsersBy(nickname, userid));
 		return modelMap;
 	}
 
@@ -348,30 +326,5 @@ public class LoginControllerV2_1 {
 		 */
 		return modelMap;
 	}
-
-	/**
-	 * 消息确认
-	 * 
-	 * @param msgid
-	 * @param userid
-	 * @param state
-	 * @return
-	 */
-	@RequestMapping(value = "/confirm_msg")
-	@ResponseBody
-	public Map<String, Object> confirmMsg(int msgid, int userid, int state) {
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		int ret = messageService.updateMsg(msgid, userid, state);
-		if (ret > 0 && state == PushMessage.CONFIRM_STATE) {
-			userService.buildFriendShip(msgid, userid);
-			modelMap.put("ret", 1);
-			modelMap.put("msg", "add friend success");
-		} else {
-			modelMap.put("ret", 0);
-			modelMap.put("msg", "add friend fail");
-		}
-		return modelMap;
-	}
-
 
 }
