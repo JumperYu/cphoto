@@ -15,8 +15,7 @@
 		<c:forEach items="${msgs}" var="msg">
 			<hr>
 			<div>
-				用户【${msg.request_user.nickname}】   请求添加你为好友  <a href="">欣然同意</a> <a href="">残忍拒绝</a>
-				
+				用户【${msg.request_user.nickname}】   请求添加你为好友  <a href="/v2_1/confirm_msg?msgid=${msg.msgid}&userid=${userid}&state=1">欣然同意</a> <a href="/v2_1/confirm_msg?msgid=${msg.msgid}&userid=${userid}&state=2">残忍拒绝</a>
 			</div>
 			<hr>
 		</c:forEach>

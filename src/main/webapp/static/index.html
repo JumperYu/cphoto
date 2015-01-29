@@ -39,7 +39,7 @@
 									+ "<span>年龄 : "+ result.account.age + "</span>"
 								    + "</div>";
 						var div_down = "<div>"
-						+ "<a href=\"\">朋友圈</a> <a href=\"/v2_1/friends/list?userid=" + result.account.userid + "\">我的好友</a> <a href=\"\">添加好友</a>"
+						+ "<a href=\"\">朋友圈</a> <a href=\"/v2_1/friends/list?userid=" + result.account.userid + "\">我的好友</a> <a href=\"/v2_1/friends/add?userid=" + result.account.userid  + "\">添加好友</a>"
 						+ "</div><hr>";
 						$("#person").show().html(div_up + div_down);
 						// 开启轮询
@@ -55,7 +55,7 @@
 									$.each(result.events, function(i, n){
 										console.log(n);
 										if(n.count > 0){
-											var msg = "<p><a href=\"/v2_1/message/list?eventid=" + n.eventid + "&userid=" + $("#hide_userid").val() +  "\">您有条新消息</a></p>";
+											var msg = "<p><a href=\"/v2_1/message/list?eventid=" + n.eventid + "&userid=" + $("#hide_userid").val() +  "\">您有" + n.count +"条新消息</a></p>";
 											console.log(msg);
 											$("#msg").show().html(msg);
 										}
