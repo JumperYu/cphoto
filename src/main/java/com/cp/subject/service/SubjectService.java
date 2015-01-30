@@ -1,11 +1,13 @@
 package com.cp.subject.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.cp.base.service.BaseService;
+import com.cp.base.service.PageService;
 import com.cp.entity.Comment;
+import com.cp.entity.Page;
 import com.cp.entity.Reply;
 import com.cp.entity.Subject;
 
@@ -17,7 +19,69 @@ import com.cp.entity.Subject;
  * 
  */
 @Service
-public class SubjectService extends BaseService {
+public class SubjectService extends PageService {
+
+	private static String PAGE_SUBJECT = "SELECT\n" +
+			"	a.id,\n" +
+			"	a.title,\n" +
+			"	a.content,\n" +
+			"	unix_timestamp(a.create_time) create_time,\n" +
+			"	unix_timestamp(a.update_time) updae_time,\n" +
+			"	b.pic_name,\n" +
+			"	b.pic_url,\n" +
+			"	b.content_type,\n" +
+			"	unix_timestamp(b.update_time) pic_update_time\n" +
+			"FROM\n" +
+			"	cp_subject a,\n" +
+			"cp_picture b\n" +
+			"WHERE\n" +
+			"	a.pictureid = b.id\n" +
+			"AND a.userid = b.userid \n" +
+			"and a.id IN (\n" +
+			"	SELECT\n" +
+			"		a.id\n" +
+			"	FROM\n" +
+			"		cp_subject a,\n" +
+			"		cp_picture b\n" +
+			"	WHERE\n" +
+			"		a.userid = ?\n" +
+			"	AND a.pictureid = b.id\n" +
+			"	AND a.userid = b.userid\n" +
+			"	UNION ALL\n" +
+			"		SELECT\n" +
+			"			a.id\n" +
+			"		FROM\n" +
+			"			cp_subject a,\n" +
+			"			cp_picture b\n" +
+			"		WHERE\n" +
+			"			a.pictureid = b.id\n" +
+			"		AND EXISTS (\n" +
+			"			SELECT\n" +
+			"				c.subjectid\n" +
+			"			FROM\n" +
+			"				cp_reply c\n" +
+			"			WHERE\n" +
+			"				b.userid = ?\n" +
+			"			AND a.id = c.subjectid\n" +
+			"		)\n" +
+			"		UNION ALL\n" +
+			"			SELECT\n" +
+			"				a.id\n" +
+			"			FROM\n" +
+			"				cp_subject a,\n" +
+			"				cp_picture b\n" +
+			"			WHERE\n" +
+			"				a.pictureid = b.id\n" +
+			"			AND EXISTS (\n" +
+			"				SELECT\n" +
+			"					t.cp_relatedid\n" +
+			"				FROM\n" +
+			"					cp_friendship t\n" +
+			"				WHERE\n" +
+			"					t.cp_userid = ?\n" +
+			"				AND a.userid = t.cp_relatedid\n" +
+			"			)\n" +
+			")";
 
 	/**
 	 * 
@@ -35,7 +99,7 @@ public class SubjectService extends BaseService {
 	 */
 	public int addSubject(String title, String content, int photoid, int userid) {
 		String sql = "insert into cp_subject(title,content,pictureid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
-		int id = getBaseDAO().insert(sql, title, content, photoid, userid);
+		int id = getPageDAO().insert(sql, title, content, photoid, userid);
 		return id;
 	}
 
@@ -57,7 +121,7 @@ public class SubjectService extends BaseService {
 	public int addReply(String title, String content, int picId, int userid,
 			String subjectid) {
 		String sql = "insert into cp_reply(title,content,pictureid,userid,subjectid,create_time,update_time) values(?,?,?,?,?,now(),now())";
-		int id = getBaseDAO().insert(sql, title, content, picId, userid,
+		int id = getPageDAO().insert(sql, title, content, picId, userid,
 				subjectid);
 		return id;
 	}
@@ -80,8 +144,19 @@ public class SubjectService extends BaseService {
 	public int addComment(String content, String subjectid, String replyid,
 			String userid) {
 		String sql = "insert into cp_comment(content,subjectid,replyid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
-		int id = getBaseDAO().insert(sql, content, subjectid, replyid, userid);
+		int id = getPageDAO().insert(sql, content, subjectid, replyid, userid);
 		return id;
+	}
+
+	/**
+	 * 分页显示主题 (-自己、 朋友、参与-) 按发布时间排序
+	 * 
+	 * @param userid
+	 * @param page
+	 * @return
+	 */
+	public List<Map<String, Object>> listSubjectByPage(int userid, Page page) {
+		return getPageDAO().queryForList(PAGE_SUBJECT, userid, userid, userid);
 	}
 
 	/**
@@ -108,23 +183,23 @@ public class SubjectService extends BaseService {
 				+ "UNIX_TIMESTAMP(create_time),UNIX_TIMESTAMP(update_time) FROM cp_comment"
 				+ " where userid=? and replyid=?";
 
-		List<Subject> subjects = getBaseDAO().queryForEntity(
+		List<Subject> subjects = getPageDAO().queryForEntity(
 				new SubjectRowMapper(), sql, userid);
 
 		for (Subject subject : subjects) {// list for query replies
 			// reply
-			List<Reply> replies = getBaseDAO().queryForEntity(
+			List<Reply> replies = getPageDAO().queryForEntity(
 					new ReplyRowMapper(), replies_sql, userid, subject.getId());
 
 			for (Reply reply : replies) {// list for replies comments
-				List<Comment> replyComments = getBaseDAO().queryForEntity(
+				List<Comment> replyComments = getPageDAO().queryForEntity(
 						new SubjectCommentRowMapper(), reply_comments_sql,
 						userid, reply.getId());
 				reply.setComments(replyComments);
 			}// reply comment
 
 			// subject comment
-			List<Comment> subComments = getBaseDAO().queryForEntity(
+			List<Comment> subComments = getPageDAO().queryForEntity(
 					new SubjectCommentRowMapper(), subject_comments_sql,
 					userid, subject.getId());
 			subject.setReplies(replies);

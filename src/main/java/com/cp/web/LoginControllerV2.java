@@ -219,7 +219,7 @@ public class LoginControllerV2 {
 	// 搜索ren
 	@RequestMapping(value = "/find_user")
 	@ResponseBody
-	public Map<String, Object> searchUser(String userid) {
+	public Map<String, Object> searchUser(int userid) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		modelMap.put("ret", 1);
 		modelMap.put("info", userService.findUserByUserid(userid));

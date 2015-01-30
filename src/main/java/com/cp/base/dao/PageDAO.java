@@ -11,7 +11,7 @@ import com.cp.entity.Page;
  * @date 2015-01-18
  *
  */
-public interface PageDAO {
+public interface PageDAO extends BaseDAO{
 
 	/**
 	 * 分页查询

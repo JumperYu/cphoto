@@ -16,7 +16,7 @@ public class BaseService {
 
 	private BaseDAO baseDAO;
 
-	@Resource
+	@Resource(name = "baseDAO")
 	public void setBaseDAO(BaseDAO baseDAO) {
 		this.baseDAO = baseDAO;
 	}

@@ -30,7 +30,7 @@ public class UserService extends BaseService {
 	private static final String LOGIN_SQL = "select id, nickname, sex, age, email, telphone, userid, account from cp_account where account=? and `password`=?";
 	private static final String REGISTER_USER_SQL = "insert into cp_account(nickname, sex, age, email, telphone, userid, account, `password`) values(?,?,?,?,?,?,?,?)";
 	private static final String FIND_FRIENDS = "select id, nickname, sex, age, email, telphone, t1.userid, account, `password` from cp_account t1, cp_friendship t2 where t1.userid=t2.cp_relatedid and t2.cp_userid=?";
-	private static final String FIND_USERS = "";
+	private static final String FIND_USER_BY_USERID = "select id, nickname, sex, age, email, telphone, userid, account from cp_account where userid=?";
 
 	// private static final String REGISTER_USER_SQL =
 	// "insert into cp_user(cp_userid, cp_account, cp_pwd) values(?, ?, ?)";
@@ -95,10 +95,9 @@ public class UserService extends BaseService {
 	 * 
 	 * @return Map
 	 */
-	public Map<String, Object> findUserByUserid(String userid) {
-		String sql = "select * from cp_user a, cp_identity b where a.cp_userid=b.cp_userid and a.cp_userid=?";
+	public Map<String, Object> findUserByUserid(int userid) {
 
-		return getBaseDAO().queryForMap(sql, userid);
+		return getBaseDAO().queryForMap(FIND_USER_BY_USERID, userid);
 	}
 
 	/**

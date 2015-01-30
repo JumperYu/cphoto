@@ -93,7 +93,7 @@ public class TestUserService {
 	
 	//@Test
 	public void testGetUserid(){
-		System.out.println(userService.findUserByUserid("1417231971"));
+		System.out.println(userService.findUserByUserid(1417231971));
 	}
 	
 }
