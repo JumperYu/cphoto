@@ -3,6 +3,7 @@ package com.cp.subject.service;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.cp.base.service.PageService;
@@ -21,67 +22,39 @@ import com.cp.entity.Subject;
 @Service
 public class SubjectService extends PageService {
 
-	private static String PAGE_SUBJECT = "SELECT\n" +
-			"	a.id,\n" +
-			"	a.title,\n" +
-			"	a.content,\n" +
-			"	unix_timestamp(a.create_time) create_time,\n" +
-			"	unix_timestamp(a.update_time) updae_time,\n" +
-			"	b.pic_name,\n" +
-			"	b.pic_url,\n" +
-			"	b.content_type,\n" +
-			"	unix_timestamp(b.update_time) pic_update_time\n" +
-			"FROM\n" +
-			"	cp_subject a,\n" +
-			"cp_picture b\n" +
-			"WHERE\n" +
-			"	a.pictureid = b.id\n" +
-			"AND a.userid = b.userid \n" +
-			"and a.id IN (\n" +
-			"	SELECT\n" +
-			"		a.id\n" +
-			"	FROM\n" +
-			"		cp_subject a,\n" +
-			"		cp_picture b\n" +
-			"	WHERE\n" +
-			"		a.userid = ?\n" +
-			"	AND a.pictureid = b.id\n" +
-			"	AND a.userid = b.userid\n" +
-			"	UNION ALL\n" +
-			"		SELECT\n" +
-			"			a.id\n" +
-			"		FROM\n" +
-			"			cp_subject a,\n" +
-			"			cp_picture b\n" +
-			"		WHERE\n" +
-			"			a.pictureid = b.id\n" +
-			"		AND EXISTS (\n" +
-			"			SELECT\n" +
-			"				c.subjectid\n" +
-			"			FROM\n" +
-			"				cp_reply c\n" +
-			"			WHERE\n" +
-			"				b.userid = ?\n" +
-			"			AND a.id = c.subjectid\n" +
-			"		)\n" +
-			"		UNION ALL\n" +
-			"			SELECT\n" +
-			"				a.id\n" +
-			"			FROM\n" +
-			"				cp_subject a,\n" +
-			"				cp_picture b\n" +
-			"			WHERE\n" +
-			"				a.pictureid = b.id\n" +
-			"			AND EXISTS (\n" +
-			"				SELECT\n" +
-			"					t.cp_relatedid\n" +
-			"				FROM\n" +
-			"					cp_friendship t\n" +
-			"				WHERE\n" +
-			"					t.cp_userid = ?\n" +
-			"				AND a.userid = t.cp_relatedid\n" +
-			"			)\n" +
-			")";
+	// 分页查找主题
+	private static String PAGE_SUBJECT = "SELECT\n" + "	a.id,\n"
+			+ "	a.title,\n" + "	a.content,\n" + "	a.userid,\n"
+			+ "	a.nickname,\n"
+			+ "	unix_timestamp(a.create_time) create_time,\n"
+			+ "	unix_timestamp(a.update_time) updae_time,\n" + "	b.pic_name,\n"
+			+ "	b.pic_url,\n" + "	b.content_type,\n"
+			+ "	unix_timestamp(b.update_time) pic_update_time\n" + "FROM\n"
+			+ "	cp_subject a,\n" + "	cp_picture b\n" + "WHERE\n"
+			+ "	a.pictureid = b.id\n" + "AND a.userid = b.userid\n"
+			+ "AND a.id IN (\n" + "	SELECT\n" + "		a.id\n" + "	FROM\n"
+			+ "		cp_subject a,\n" + "		cp_picture b\n" + "	WHERE\n"
+			+ "		a.userid = ?\n" + "	AND a.pictureid = b.id\n"
+			+ "	AND a.userid = b.userid\n" + "	UNION ALL\n" + "		SELECT\n"
+			+ "			a.id\n" + "		FROM\n" + "			cp_subject a,\n"
+			+ "			cp_picture b\n" + "		WHERE\n" + "			a.pictureid = b.id\n"
+			+ "		AND EXISTS (\n" + "			SELECT\n" + "				c.subjectid\n"
+			+ "			FROM\n" + "				cp_reply c\n" + "			WHERE\n"
+			+ "				b.userid = ?\n" + "			AND a.id = c.subjectid\n" + "		)\n"
+			+ "		UNION ALL\n" + "			SELECT\n" + "				a.id\n" + "			FROM\n"
+			+ "				cp_subject a,\n" + "				cp_picture b\n" + "			WHERE\n"
+			+ "				a.pictureid = b.id\n" + "			AND EXISTS (\n" + "				SELECT\n"
+			+ "					t.cp_relatedid\n" + "				FROM\n" + "					cp_friendship t\n"
+			+ "				WHERE\n" + "					t.cp_userid = ?\n"
+			+ "				AND a.userid = t.cp_relatedid\n" + "			)\n" + ")" + " ";
+
+	// 分页查找评论
+	private static String PAGE_SUBJECT_COMMENTS = "SELECT\n" + "	id,\n"
+			+ "	content,\n" + "	subjectid,\n" + "	replyid,\n" + "	userid,\n"
+			+ "   nickname,\n" + "	UNIX_TIMESTAMP(create_time) create_time,\n"
+			+ "	UNIX_TIMESTAMP(update_time) update_time\n" + "FROM\n"
+			+ "	cp_comment\n" + "WHERE\n" + "	subjectid = ?"
+			+ " order by create_time desc";
 
 	/**
 	 * 
@@ -95,11 +68,16 @@ public class SubjectService extends PageService {
 	 *            照片表对应的ID
 	 * @param userid
 	 *            用户
+	 * @param nickname
+	 *            别名
 	 * @return int id
+	 * 
 	 */
-	public int addSubject(String title, String content, int photoid, int userid) {
-		String sql = "insert into cp_subject(title,content,pictureid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
-		int id = getPageDAO().insert(sql, title, content, photoid, userid);
+	public int addSubject(String title, String content, int photoid,
+			int userid, String nickname) {
+		String sql = "insert into cp_subject(title,content,pictureid,userid,nickname,create_time,update_time) values(?,?,?,?,?,now(),now())";
+		int id = getPageDAO().insert(sql, title, content, photoid, userid,
+				nickname);
 		return id;
 	}
 
@@ -142,10 +120,33 @@ public class SubjectService extends PageService {
 	 * @return int
 	 */
 	public int addComment(String content, String subjectid, String replyid,
-			String userid) {
-		String sql = "insert into cp_comment(content,subjectid,replyid,userid,create_time,update_time) values(?,?,?,?,now(),now())";
+			int userid, String nickname) {
+		String sql = "insert into cp_comment(content,subjectid,replyid,userid,nickname,create_time,update_time) values(?,?,?,?,?,now(),now())";
 		int id = getPageDAO().insert(sql, content, subjectid, replyid, userid);
 		return id;
+	}
+
+	/**
+	 * 查找主题评论
+	 * 
+	 * @param subjectid
+	 *            主题id
+	 * @return
+	 */
+	public List<Map<String, Object>> getCommentsBySid(int subjectid, Page page) {
+		return getPageDAO().queryForPageList(PAGE_SUBJECT_COMMENTS, page,
+				subjectid);
+	}
+
+	/**
+	 * 查找回帖评论
+	 * 
+	 * @param subjectid
+	 *            主题id
+	 * @return
+	 */
+	public List<Map<String, Object>> getCommentsByRid(int subjectid) {
+		return null;
 	}
 
 	/**
@@ -153,10 +154,35 @@ public class SubjectService extends PageService {
 	 * 
 	 * @param userid
 	 * @param page
+	 * @param timeline
+	 *            时间轴
+	 * @param method
+	 *            uptodate/past
 	 * @return
 	 */
-	public List<Map<String, Object>> listSubjectByPage(int userid, Page page) {
-		return getPageDAO().queryForList(PAGE_SUBJECT, userid, userid, userid);
+	public List<Map<String, Object>> listSubjectByPage(int userid,
+			Long timeline, String method, Page page) {
+		String sql = "";
+		if(timeline == null || timeline == 0) {
+			sql += PAGE_SUBJECT
+					+ " order by a.create_time desc";
+		} else if (StringUtils.isEmpty(method) || method.equals("uptodate")) {
+			sql += PAGE_SUBJECT
+					+ " and a.create_time > ? order by a.create_time desc";
+		} else {
+			sql += PAGE_SUBJECT
+					+ " and a.create_time < ? order by a.create_time desc";
+		}
+		List<Map<String, Object>> subs = getPageDAO().queryForPageList(sql,
+				page, userid, userid, userid);
+		for (Map<String, Object> sub : subs) {
+			Page cp = new Page();
+			List<Map<String, Object>> comms = getCommentsBySid(
+					Integer.parseInt(sub.get("id").toString()), cp);
+			sub.put("comments", comms);
+			sub.put("comments_page", cp);
+		}
+		return subs;
 	}
 
 	/**

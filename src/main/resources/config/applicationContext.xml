@@ -73,6 +73,7 @@
 		<property name="jpaProperties">
 			<props>
 				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 				<!-- <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory 
 					</prop> <prop key="net.sf.ehcache.configurationResourceName">config/ehcache-hibernate-local.xml</prop> -->
 			</props>

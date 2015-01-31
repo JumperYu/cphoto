@@ -46,7 +46,7 @@ public class TestForm {
 	@Before
 	public void testLogin() {
 		String param = "account=xiaoyu&password=123";
-		String body = HttpRequestUtil.httpRequest("GET", local_domain
+		String body = HttpRequestUtil.httpRequest("GET", release_domain
 				+ "/v2_1/login", param, null);
 		JSONObject jsb = new JSONObject(body);
 		sessionid = jsb.getJSONObject("session").getString("sessionid");
@@ -55,6 +55,7 @@ public class TestForm {
 
 	@Test
 	public void testUpload() throws IOException, InterruptedException {
+		int count = 0;
 		while (true) {
 			String targetURL = null; // -- 指定URL
 
@@ -63,7 +64,7 @@ public class TestForm {
 			String filepath = "E:\\logo6.png";
 			String filename = "ok.jpg";
 
-			targetURL = local_domain + "/v2_1/add_subject";
+			targetURL = release_domain + "/v2_1/add_subject";
 			// targetURL = "http://localhost:8080/cphoto/v2_1/add_subject";
 
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -75,7 +76,7 @@ public class TestForm {
 				FileBody bin = new FileBody(targetFile, ContentType.create(
 						"multipart/form-data", Consts.UTF_8), filename);
 
-				StringBody title = new StringBody("这是一个标题", ContentType.create(
+				StringBody title = new StringBody("话题标语-" + count, ContentType.create(
 						"text/plain", Consts.UTF_8));
 				StringBody content = new StringBody("这是一个内容",
 						ContentType.create("text/plain", Consts.UTF_8));
@@ -114,7 +115,9 @@ public class TestForm {
 				httpclient.close();
 			}
 			// 缓缓
-			Thread.sleep(500);
+			Thread.sleep(1000);
+			count++;
+//			break;
 		}
 
 	}
@@ -274,9 +277,9 @@ public class TestForm {
 	public void testListSubject() {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("cookie", "JSESSIONID=" + sessionid);
-		String param = "userid=" + userid;
-		HttpRequestUtil.httpRequest("GET", "http://" + release_domain
-				+ "/cphoto/v2_1/list_subjects", param, headers);
+		String param = "userid=" + userid + "";
+		HttpRequestUtil.httpRequest("GET", local_domain
+				+ "/v2_1/list_subjects", param, headers);
 	}
 
 	// @Test

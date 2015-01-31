@@ -29,7 +29,7 @@ public class TestSubjectService {
 
 	// @Test
 	public void addSubject() {
-		subjectService.addSubject("主题-1", "c-1", 1, 1);
+		subjectService.addSubject("主题-1", "c-1", 1, 1, "小鱼");
 	}
 
 	// @Test
@@ -39,7 +39,7 @@ public class TestSubjectService {
 
 	// @Test
 	public void addComment() {
-		subjectService.addComment("hehe", "1", "1", "1");
+		subjectService.addComment("hehe", "1", "1", 1, "小鱼");
 	}
 
 	@Test
@@ -51,9 +51,8 @@ public class TestSubjectService {
 	@Test
 	public void getPageSubject() {
 		Page page = new Page(); 
-		page.setIndex(2);
-		page.setSize(10);
-		System.out.println(subjectService.listSubjectByPage(1422524281, page));
+		page.setIndex(1);
+		System.out.println(subjectService.listSubjectByPage(1422524281,1L, "", page));
 	}
 
 }

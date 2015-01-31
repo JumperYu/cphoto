@@ -98,6 +98,8 @@ SELECT
 	a.id,
 	a.title,
 	a.content,
+	a.userid,
+	a.nickname,
 	unix_timestamp(a.create_time) create_time,
 	unix_timestamp(a.update_time) updae_time,
 	b.pic_name,
@@ -106,11 +108,11 @@ SELECT
 	unix_timestamp(b.update_time) pic_update_time
 FROM
 	cp_subject a,
-cp_picture b
+	cp_picture b
 WHERE
 	a.pictureid = b.id
-AND a.userid = b.userid 
-and a.id IN (
+AND a.userid = b.userid
+AND a.id IN (
 	SELECT
 		a.id
 	FROM
@@ -155,5 +157,19 @@ and a.id IN (
 				AND a.userid = t.cp_relatedid
 			)
 );
+
+-- 查找主题下面的
+SELECT
+	id,
+	content,
+	subjectid,
+	replyid,
+	userid,
+	UNIX_TIMESTAMP(create_time) create_time,
+	UNIX_TIMESTAMP(update_time) update_time
+FROM
+	cp_comment
+WHERE
+	subjectid = 1;
 
 	

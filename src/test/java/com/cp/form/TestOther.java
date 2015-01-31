@@ -1,5 +1,6 @@
 package com.cp.form;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -16,6 +17,17 @@ public class TestOther {
 		param += "&signtype=RSA&a=1";
 		HttpRequestUtil.httpRequest("GET", "http://" + "42.62.59.46"
 				+ "/ms/aibei_qmfx/payback", param, null);
+	}
+	
+	@Test
+	public void testB() {
+		System.out.println(Long.toBinaryString(Long.MAX_VALUE).length());
+	}
+	
+	@Test
+	public void testDir() {
+		File file = new File("d:/123/321/122");
+		file.mkdir();
 	}
 	
 }

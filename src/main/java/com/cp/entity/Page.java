@@ -10,9 +10,9 @@ public class Page {
 
 	public static final int DEFAULT_SIZE = 10;
 
-	private int index; // 索引
-	private int size; // 页面大小
-	private int count; // 页面总数
+	private int index = 1; // 索引
+	private int size = 10; // 页面大小
+	private int count = 0; // 页面总数
 
 	public Page() {
 	}

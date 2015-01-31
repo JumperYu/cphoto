@@ -9,7 +9,7 @@
 </head>
 <body>
 	<div id="nav">
-		<a href="/v2_1/index?userid=${userid}">返回首页</a> <a href="">朋友圈</a>
+		<a href="/v2_1/index?userid=${userid}">返回首页</a>
 	</div>
 	<div id="search-div">
 		<div>
@@ -24,7 +24,7 @@
 			$("#search").on("click", function(e) {
 				$.ajax({
 					type : "GET",
-					url : "/v2_1/find_users",
+					url : "/v2_1/list_subjects",
 					data : {
 						nickname : encodeURIComponent($("#content").val()),
 						userid :  "${userid}"
