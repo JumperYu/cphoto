@@ -153,28 +153,36 @@ public class SubjectService extends PageService {
 	 * 分页显示主题 (-自己、 朋友、参与-) 按发布时间排序
 	 * 
 	 * @param userid
-	 * @param page
+	 *            用户id
+	 * @param subjectid
+	 *            主题id
 	 * @param timeline
 	 *            时间轴
+	 * @param page
+	 *            分页
 	 * @param method
 	 *            uptodate/past
 	 * @return
 	 */
 	public List<Map<String, Object>> listSubjectByPage(int userid,
-			Long timeline, String method, Page page) {
+			Long subjectId, Long timeline, String method, Page page) {
 		String sql = "";
+		Object[] params = null;
 		if(timeline == null || timeline == 0) {
 			sql += PAGE_SUBJECT
 					+ " order by a.create_time desc";
+			params = new Object[]{userid, userid, userid};
 		} else if (StringUtils.isEmpty(method) || method.equals("uptodate")) {
 			sql += PAGE_SUBJECT
-					+ " and a.create_time > ? order by a.create_time desc";
+					+ " and a.id > ? and UNIX_TIMESTAMP(a.create_time) > ? order by a.create_time desc";
+			params = new Object[]{ userid, userid, userid, subjectId, timeline};
 		} else {
 			sql += PAGE_SUBJECT
-					+ " and a.create_time < ? order by a.create_time desc";
+					+ " and a.id < ? and UNIX_TIMESTAMP(a.create_time) < ? order by a.create_time desc";
+			params = new Object[]{ userid, userid, userid, subjectId, timeline};
 		}
 		List<Map<String, Object>> subs = getPageDAO().queryForPageList(sql,
-				page, userid, userid, userid);
+				page, params);
 		for (Map<String, Object> sub : subs) {
 			Page cp = new Page();
 			List<Map<String, Object>> comms = getCommentsBySid(

@@ -52,8 +52,8 @@ public class PublishController {
 
 	@Resource
 	private PhotoService photoService;
-	
-	@Resource 
+
+	@Resource
 	UserService userService;
 
 	// 网页接口
@@ -94,8 +94,9 @@ public class PublishController {
 
 			int picId = photoService.savePic(file.getOriginalFilename(),
 					filePath, contentType, userid, fileUrl);
-			/*查找用户别名*/
-			String nickname = userService.findUserByUserid(userid).get("nickname").toString();
+			/* 查找用户别名 */
+			String nickname = userService.findUserByUserid(userid)
+					.get("nickname").toString();
 			/* int subId = */
 			subjectService.addSubject(
 					Servlets.ignoreStringNull(params.get("title")),
@@ -170,21 +171,23 @@ public class PublishController {
 		modelMap.put("msg", msg);
 		return modelMap;
 	}
-	
+
 	/**
 	 * 分页返回所有相关主题信息
 	 * 
 	 * @param userid
 	 * @param page
-	 * @param timeline 时间轴
+	 * @param timeline
+	 *            时间轴
 	 * @return
 	 */
 	@RequestMapping("/list_subjects")
 	@ResponseBody
-	public Map<String, Object> reqUserSubjects(int userid, Page page, Long timeline, String method) {
+	public Map<String, Object> reqUserSubjects(int userid, Page page,
+			Long subjectid, Long timeline, String method) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		List<Map<String, Object>> subs = subjectService.listSubjectByPage(
-				userid, timeline, method, page);
+				userid, subjectid, timeline, method, page);
 		if (subs != null && subs.size() > 0) {
 			modelMap.put("ret", 1);
 			modelMap.put("subjects", subs);
@@ -219,10 +222,11 @@ public class PublishController {
 		}
 
 		Map<String, Object> modelMap = new HashMap<String, Object>();
-		/*查找用户别名*/
-		String nickname = userService.findUserByUserid(userid).get("nickname").toString();
-		int ret = subjectService
-				.addComment(content, subjectid, replyid, userid, nickname);
+		/* 查找用户别名 */
+		String nickname = userService.findUserByUserid(userid).get("nickname")
+				.toString();
+		int ret = subjectService.addComment(content, subjectid, replyid,
+				userid, nickname);
 
 		modelMap.put("ret", ret > 0 ? 1 : -1);
 		modelMap.put("msg", "added comment");
