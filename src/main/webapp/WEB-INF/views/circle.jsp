@@ -68,7 +68,8 @@ margin: 5px 0;
 				success : function(result) {
 					//var $body = $("body");
 					var $div = $("ol");
-					console.log(result.subjects);
+					if(!result.subjects || result.subjects.length <= 0)
+							alert("没有更多的数据了");
 					if(result.ret && result.ret == 1) {
 						$.each(result.subjects, function(i, n){
 							var $img = "<li><p><img src=\"" + n.pic_url + "?300x300" + "\" width=\"300\" height=\"100\"/></p>";

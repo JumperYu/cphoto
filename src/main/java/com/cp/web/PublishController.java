@@ -171,6 +171,33 @@ public class PublishController {
 		modelMap.put("msg", msg);
 		return modelMap;
 	}
+	
+	/**
+	 * 分页返回所有相关主题信息
+	 * 
+	 * @param userid
+	 * @param page
+	 * @param timeline
+	 *            时间轴
+	 * @return
+	 */
+	@RequestMapping("/list_subjectid")
+	@ResponseBody
+	public Map<String, Object> reqUserSubjectIds(int userid, Page page,
+			Long subjectid, Long timeline, String method) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		List<Map<String, Object>> subs = subjectService.listSubjectByPage(
+				userid, subjectid, timeline, method, page);
+		if (subs != null && subs.size() > 0) {
+			modelMap.put("ret", 1);
+			modelMap.put("subjects", subs);
+			modelMap.put("page", page);
+		} else {
+			modelMap.put("ret", 0);
+			modelMap.put("subjects", null);
+		}
+		return modelMap;
+	}
 
 	/**
 	 * 分页返回所有相关主题信息
@@ -231,5 +258,11 @@ public class PublishController {
 		modelMap.put("ret", ret > 0 ? 1 : -1);
 		modelMap.put("msg", "added comment");
 		return modelMap;
+	}
+	
+	// 根据subjectid获取subject
+	@RequestMapping("/find_subject")
+	public Map<String, Object> reqSubject(int userid, Long subjectid) {
+		return subjectService.getSubjectById(userid, subjectid);
 	}
 }

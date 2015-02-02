@@ -29,8 +29,8 @@ public class SpyClient {
 		if (mc == null) {
 			try {
 				mc = new MemcachedClient(new InetSocketAddress[] {
-						new InetSocketAddress("112.124.126.31", 12000),
-						new InetSocketAddress("121.199.67.141", 12000)});
+						new InetSocketAddress("112.124.126.31", 12000)/*,
+						new InetSocketAddress("121.199.67.141", 12000)*/});
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

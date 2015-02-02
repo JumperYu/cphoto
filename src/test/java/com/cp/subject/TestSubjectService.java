@@ -52,7 +52,7 @@ public class TestSubjectService {
 	public void getPageSubject() {
 		Page page = new Page();
 		page.setIndex(1);
-		System.out.println(subjectService.listSubjectByPage(1422524281, 1266L, 0L, "uptodate",
+		System.out.println(subjectService.listSubjectByPage(1422524281, 0L, 0L, "",
 				page));
 	}
 

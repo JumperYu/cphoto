@@ -41,6 +41,8 @@ SELECT
 	a.id,
 	a.title,
 	a.content,
+	a.userid,
+	a.nickname,
 	unix_timestamp(a.create_time) create_time,
 	unix_timestamp(a.update_time) updae_time,
 	b.pic_name,
@@ -52,17 +54,8 @@ FROM
 	cp_picture b
 WHERE
 	a.pictureid = b.id
-AND EXISTS (
-	SELECT
-		c.subjectid
-	FROM
-		cp_reply c
-	WHERE
-		b.userid = '1422524281'
-	AND a.id = c.subjectid
-)
-ORDER BY
-	a.create_time DESC;
+AND a.id='1577';
+
 
 -- 查出朋友的帖子
 SELECT
@@ -158,7 +151,7 @@ AND a.id IN (
 			)
 );
 
--- 查找主题下面的
+-- 查找主题下面的评论
 SELECT
 	id,
 	content,
@@ -171,5 +164,28 @@ FROM
 	cp_comment
 WHERE
 	subjectid = 1;
+
+-- 查找回帖
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	a.userid,
+	a.nickname,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time
+FROM
+	cp_reply a,
+	cp_picture b
+WHERE
+	a.pictureid = b.id
+AND a.userid = b.userid
+AND a.subjectid='1577';
+
+
 
 	

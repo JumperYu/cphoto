@@ -46,6 +46,21 @@ create table cp_reply(
 	PRIMARY KEY(id)
 )ENGINE=INNODB default charset utf8;
 
+-- 跟帖
+drop table if exists cp_reply;
+create table cp_reply(
+	id int AUTO_INCREMENT,
+	title varchar(60) NOT NULL COMMENT '标题',
+	content varchar(255) NOT NULL COMMENT '主要内容',
+	pictureid int NOT NULL comment '图片id',
+	userid int NOT NULL COMMENT '回帖者id',
+	nickname varchar(30) COMMENT '用户别名',
+	subjectid int NOT NULL COMMENT '主题id',
+	create_time datetime NOT NULL COMMENT '记录时间',
+	update_time datetime DEFAULT NULL COMMENT '更新时间',
+	PRIMARY KEY(id)
+)ENGINE=INNODB default charset utf8;
+
 -- 评论
 drop table if exists cp_comment;
 create table cp_comment(

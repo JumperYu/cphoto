@@ -47,7 +47,27 @@ public class SubjectService extends PageService {
 			+ "					t.cp_relatedid\n" + "				FROM\n" + "					cp_friendship t\n"
 			+ "				WHERE\n" + "					t.cp_userid = ?\n"
 			+ "				AND a.userid = t.cp_relatedid\n" + "			)\n" + ")" + " ";
-
+	
+	private static String PAGE_REPLY = "SELECT\n" +
+			"	a.id,\n" +
+			"	a.title,\n" +
+			"	a.content,\n" +
+			"	a.userid,\n" +
+			"	a.nickname,\n" +
+			"	unix_timestamp(a.create_time) create_time,\n" +
+			"	unix_timestamp(a.update_time) updae_time,\n" +
+			"	b.pic_name,\n" +
+			"	b.pic_url,\n" +
+			"	b.content_type,\n" +
+			"	unix_timestamp(b.update_time) pic_update_time\n" +
+			"FROM\n" +
+			"	cp_reply a,\n" +
+			"	cp_picture b\n" +
+			"WHERE\n" +
+			"	a.pictureid = b.id\n" +
+			"AND a.userid = b.userid\n" +
+			"AND a.subjectid=?";
+	
 	// 分页查找评论
 	private static String PAGE_SUBJECT_COMMENTS = "SELECT\n" + "	id,\n"
 			+ "	content,\n" + "	subjectid,\n" + "	replyid,\n" + "	userid,\n"
@@ -184,9 +204,15 @@ public class SubjectService extends PageService {
 		List<Map<String, Object>> subs = getPageDAO().queryForPageList(sql,
 				page, params);
 		for (Map<String, Object> sub : subs) {
+			Page rp = new Page();
+			rp.setSize(100);
+			List<Map<String, Object>> replies = getPageDAO().queryForPageList(PAGE_REPLY,
+					page, sub.get("id"));
 			Page cp = new Page();
 			List<Map<String, Object>> comms = getCommentsBySid(
 					Integer.parseInt(sub.get("id").toString()), cp);
+			cp.setCount(comms.size());
+			sub.put("replies", replies);
 			sub.put("comments", comms);
 			sub.put("comments_page", cp);
 		}
@@ -242,6 +268,11 @@ public class SubjectService extends PageService {
 		}// end of for
 
 		return subjects;
+	}
+	
+	public Map<String, Object> getSubjectById(int userid, Long subjectid) {
+		String sql = "";
+		return null;
 	}
 
 }
