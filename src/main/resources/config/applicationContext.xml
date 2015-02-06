@@ -63,7 +63,7 @@
 		</property>
 	</bean>
 
-	<!-- Jpa Entity Manager 配置 -->
+	<!-- Jpa Entity Manager 配置 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -74,12 +74,13 @@
 			<props>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<!-- <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory 
-					</prop> <prop key="net.sf.ehcache.configurationResourceName">config/ehcache-hibernate-local.xml</prop> -->
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory 
+					</prop> <prop key="net.sf.ehcache.configurationResourceName">config/ehcache-hibernate-local.xml</prop>
 			</props>
 		</property>
 	</bean>
-
+	-->
+	<!-- 
 	<bean id="persistenceProvider" class="org.hibernate.jpa.HibernatePersistenceProvider" />
 
 	<bean id="jpaVendorAdapter"
@@ -87,11 +88,12 @@
 	</bean>
 
 	<bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	 -->
 	<!-- end ORM -->
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+<!-- 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
-	</bean>
+	</bean> -->
 
 	<!-- 事物 -->
 	<!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cp.constant.PushMessage;
+import com.cp.entity.Event;
 import com.cp.entity.Message;
 import com.cp.msg.MessageService;
 import com.cp.user.service.UserService;
@@ -43,7 +44,19 @@ public class MessageController {
 	}
 
 	// --> 数据接口
-
+	
+	@RequestMapping(value = "/long_poll")
+	@ResponseBody
+	public Map<String, Object> longPoll(int userid) {
+		List<Event> events = messageService.getEventMsg(userid);
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		if (events != null && events.size() > 0) {
+			modelMap.put("ret", 1);
+			modelMap.put("events", events);
+		}
+		return modelMap;
+	}
+	
 	// 轮询接口
 	@RequestMapping(value = "/req_msg")
 	@ResponseBody

@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,12 +59,48 @@ public class FriendsController {
 	}
 	
 	// 搜索人
+	@RequestMapping(value = "/find_user")
+	@ResponseBody
+	public Map<String, Object> searchUser(int userid) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		modelMap.put("ret", 1);
+		modelMap.put("info", userService.findUserByUserid(userid));
+		return modelMap;
+	}
+	
+	// 模糊搜索人
 	@RequestMapping(value = "/find_users")
 	@ResponseBody
 	public Map<String, Object> searchUsers(String nickname, int userid) throws UnsupportedEncodingException {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		modelMap.put("ret", 1);
 		modelMap.put("info", userService.findUsersBy(URLDecoder.decode(nickname, "utf-8"), userid));
+		return modelMap;
+	}
+	
+	/**
+	 * 多功能更搜索
+	 * 
+	 * @param method
+	 *            [FIND_USERS]
+	 * @param request
+	 * @return Map info
+	 */
+	@RequestMapping(value = "/search")
+	@ResponseBody
+	public Map<String, Object> search(String method, int userid,
+			HttpServletRequest request) {
+		Map<String, Object> params = Servlets.getBodyWihtHttpRequest(request);
+
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		if (StringUtils.isNotEmpty(method) && method.equals("FIND_USERS")) {
+			String query = Servlets.ignoreStringNull(params.get("query"));
+			modelMap.put("ret", 1);
+			modelMap.put("info", userService.findUsersBy(query, userid));
+		} else {
+			modelMap.put("ret", -1);
+			modelMap.put("info", new Object[] {});
+		}
 		return modelMap;
 	}
 	

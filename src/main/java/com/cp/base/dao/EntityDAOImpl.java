@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * 
@@ -23,7 +22,7 @@ import javax.persistence.PersistenceContext;
 public abstract class EntityDAOImpl<E extends Serializable, PK extends Serializable>
 		implements EntityDAO<E, PK> {
 
-	@PersistenceContext
+	//@PersistenceContext
 	private EntityManager em;
 
 	private Class<?> entityClass;

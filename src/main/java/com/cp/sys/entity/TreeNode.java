@@ -5,22 +5,20 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 /**
  * 树形结构示例
  * 
  * @author
  */
-@Entity
-@Table(name = "DEMO_T_TREE_NODE")
+//@Entity
+//@Table(name = "DEMO_T_TREE_NODE")
 public class TreeNode {
 
 	public TreeNode() {

@@ -30,4 +30,9 @@ public class TestOther {
 		file.mkdir();
 	}
 	
+	@Test
+	public void testInt () {
+		System.out.println(Math.pow(2, 8));
+	}
+	
 }

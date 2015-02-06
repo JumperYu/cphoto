@@ -45,7 +45,7 @@
 				allowBlank : false
 			},  {
 	            xtype      : 'fieldcontainer',
-	            fieldLabel : 'gender',
+	            fieldLabel : 'sex',
 	            defaultType: 'radiofield',
 	            defaults: {
 	                flex: 1
@@ -54,13 +54,13 @@
 	            items: [
 	                {
 	                    boxLabel  : '男',
-	                    name      : 'gender',
-	                    inputValue: '0',
+	                    name      : 'sex',
+	                    inputValue: '男',
 	                    id        : 'radio1'
 	                }, {
 	                    boxLabel  : '女',
-	                    name      : 'gender',
-	                    inputValue: '1',
+	                    name      : 'sex',
+	                    inputValue: '女',
 	                    id        : 'radio2'
 	                }
 	            ]
@@ -97,7 +97,7 @@
 						form.submit({
 							success : function(form, action) {
 								Ext.Msg.alert('Success', action.result.msg);
-								window.location.href = "index.html";
+								window.location.href = "/v2_1/index?userid=" + action.result.account.userid;
 							},
 							failure : function(form, action) {
 								Ext.Msg.alert('Failed', action.result.msg);

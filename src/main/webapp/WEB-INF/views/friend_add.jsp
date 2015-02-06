@@ -24,7 +24,7 @@
 			$("#search").on("click", function(e) {
 				$.ajax({
 					type : "GET",
-					url : "/v2_1/list_subjects",
+					url : "/v2_1/find_users",
 					data : {
 						nickname : encodeURIComponent($("#content").val()),
 						userid :  "${userid}"

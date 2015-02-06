@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import com.cp.entity.UserAgent;
 import com.google.common.base.Charsets;
 import com.google.common.net.HttpHeaders;
 
@@ -175,6 +176,7 @@ public class Servlets {
 		return params;
 	}
 
+	// 忽略.toString NullPointer
 	public static String ignoreStringNull(Object var) {
 		if (var != null && var instanceof String)
 			return (String) var;
@@ -182,5 +184,22 @@ public class Servlets {
 			log.error("calling ignoreStringNull function error, beacause object is not a string.");
 			return "";
 		}
+	}
+
+	// 判定请求来源 2015-02-06 还需完善
+	// javascript:var u=navigator.userAgent;
+	// if (u.toLowerCase().indexOf('android') != -1) android else ios
+	public static String whereDoYouCameFrom(HttpServletRequest request) {
+		String agent = "";
+		try {
+			if (getHeaderWihtHttpRequest(request).get("user-agent").toString().contains(UserAgent.WebPageKey)) {
+				agent = UserAgent.WebPageKey;
+			} else {
+				agent = UserAgent.OtherEnd;
+			}
+		} catch (Exception e) {
+			agent = UserAgent.UnknownKey;
+		}
+		return agent;
 	}
 }

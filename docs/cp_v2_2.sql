@@ -1,3 +1,5 @@
+-- 当前版本
+
 use `cphoto`;
 
 -- 用户表
@@ -16,6 +18,7 @@ create table `cp_account` (
 	UNIQUE KEY (`account`, `userid`),
 	KEY INDEX_PWD (`password`)
 )ENGINE=INNODB default charset utf8;
+
 -- 主题
 drop table `cp_subject`;
 create table cp_subject(
@@ -28,7 +31,7 @@ create table cp_subject(
 	state  int NOT NULL DEFAULT 1 COMMENT '主题状态',
 	create_time datetime NOT NULL COMMENT '记录时间',
 	update_time datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY(id)
+  	PRIMARY KEY(id)
 )ENGINE=INNODB default charset utf8;
 
 -- 跟帖

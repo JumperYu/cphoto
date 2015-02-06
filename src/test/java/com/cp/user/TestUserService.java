@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.cp.constant.PushMessage;
+import com.cp.entity.UserAccount;
 import com.cp.photo.service.PhotoService;
 import com.cp.user.service.UserService;
 
@@ -33,15 +34,14 @@ public class TestUserService {
 		String cphoto = ""
 				+ (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 100);
 //		String account = "mytest_" + Math.round(Math.random() * 1000);
-		String account = "xiaoyu";
+/*		String account = "xiaoyu";
 		String password = "123";
 		String nickname = "小雨";
 		String gender = "x";
 		String age = "25";
 		String email = "zxm@163.com";
-		String telphone = "18675857854";
-		userService.register(cphoto, account, password, nickname, gender, age,
-				email, telphone);
+		String telphone = "18675857854";*/
+		userService.register(new UserAccount());
 	}
 
 	@Test

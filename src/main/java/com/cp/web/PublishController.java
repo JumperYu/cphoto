@@ -28,11 +28,14 @@ import com.cp.utils.PictureIO;
 
 /**
  * 
+ * 发布、跟帖控制层
+ * 
  * @author zengxm 2015年01月05日
  * 
  *         V2.2.0
  * 
  * @update 完善图片的压缩和存放
+ * @update 完善模块 2015-02-06
  * 
  */
 @Controller
@@ -61,7 +64,9 @@ public class PublishController {
 	public String toCircleFriends(int userid) {
 		return "circle";
 	}
-
+	
+	// 数据接口
+	
 	// 发表一个主题
 	@RequestMapping(value = "/add_subject", method = RequestMethod.POST)
 	@ResponseBody
