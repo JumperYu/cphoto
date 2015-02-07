@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sql-union SYSTEM "file:E:\work\workspace\hoolai\cphoto\src\main\resources\dtd\sql-union.dtd ">
+<sql-union>
+<sql id="find_subjects" desc="分页查找用户的主题">
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time 
+FROM
+	cp_subject a,
+	cp_picture b7
+WHERE
+	a.userid = '1422524281'
+AND a.pictureid = b.id
+AND a.userid = b.userid
+ORDER BY
+	a.create_time DESC
+</sql>
+<sql id="find_replies" desc="分页查找主题下的回帖">
+
+</sql>
+</sql-union>

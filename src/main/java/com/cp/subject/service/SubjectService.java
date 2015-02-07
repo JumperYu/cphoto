@@ -269,10 +269,5 @@ public class SubjectService extends PageService {
 
 		return subjects;
 	}
-	
-	public Map<String, Object> getSubjectById(int userid, Long subjectid) {
-		String sql = "";
-		return null;
-	}
 
 }

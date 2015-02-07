@@ -1,7 +1,5 @@
 package com.cp.user;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +29,6 @@ public class TestUserService {
 
 	//@Test
 	public void testUserRegister() {
-		String cphoto = ""
-				+ (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 100);
 //		String account = "mytest_" + Math.round(Math.random() * 1000);
 /*		String account = "xiaoyu";
 		String password = "123";

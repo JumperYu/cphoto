@@ -264,10 +264,4 @@ public class PublishController {
 		modelMap.put("msg", "added comment");
 		return modelMap;
 	}
-	
-	// 根据subjectid获取subject
-	@RequestMapping("/find_subject")
-	public Map<String, Object> reqSubject(int userid, Long subjectid) {
-		return subjectService.getSubjectById(userid, subjectid);
-	}
 }
