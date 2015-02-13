@@ -192,7 +192,8 @@ public class Servlets {
 	public static String whereDoYouCameFrom(HttpServletRequest request) {
 		String agent = "";
 		try {
-			if (getHeaderWihtHttpRequest(request).get("user-agent").toString().contains(UserAgent.WebPageKey)) {
+			if (getHeaderWihtHttpRequest(request).get("user-agent").toString()
+					.contains(UserAgent.WebPageKey)) {
 				agent = UserAgent.WebPageKey;
 			} else {
 				agent = UserAgent.OtherEnd;
@@ -201,5 +202,31 @@ public class Servlets {
 			agent = UserAgent.UnknownKey;
 		}
 		return agent;
+	}
+
+	// GET 方法可以通过request.getQueryString()获取请求串
+	// POST 需要通过request.getParamaterMap()逐个拼接
+	public String getQueryString(HttpServletRequest request) {
+		Map<String, String[]> params = request.getParameterMap();
+		String queryString = "";
+		for (String key : params.keySet()) {
+			String[] values = params.get(key);
+			for (int i = 0; i < values.length; i++) {
+				String value = values[i];
+				queryString += key + "=" + value + "&";
+			}
+		}
+        // 去掉最后一个空格  
+        queryString = queryString.substring(0, queryString.length() - 1);
+		return queryString;
+	}
+
+	// GET获取QueryString
+	public String getQueryString(HttpServletRequest request, String method) {
+		if ("GET".equalsIgnoreCase(method)) {
+			return request.getQueryString();
+		} else {
+			return getQueryString(request);
+		}
 	}
 }

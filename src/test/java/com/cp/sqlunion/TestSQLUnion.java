@@ -116,16 +116,16 @@ public class TestSQLUnion {
 		}
 	}
 
-	// --------------------------------- 测试SAX  -------------------
-    // 纯SAX对于写操作无能为力
+	// --------------------------------- 测试SAX -------------------
+	// 纯SAX对于写操作无能为力
 	@Test
 	public void testSaxRead() {
 		try {
-			 //1.创建解析工厂
+			// 1.创建解析工厂
 			SAXParserFactory factory = SAXParserFactory.newInstance();
-			 //2.得到解析器 
+			// 2.得到解析器
 			SAXParser parser = factory.newSAXParser();
-			//3.得到读取器 
+			// 3.得到读取器
 			InputStream in = TestSQLUnion.class.getClassLoader()
 					.getResourceAsStream(xml_uri);
 			parser.parse(in, new MyHandler());
@@ -137,21 +137,25 @@ public class TestSQLUnion {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// --------------------------------- 测试DOM4j -------------------
-    public static void testDom4j() throws DocumentException {
-    	SAXReader reader = new SAXReader();
-    	InputStream in = TestSQLUnion.class.getClassLoader().getResourceAsStream(xml_uri);
-    	org.dom4j.Document doc = reader.read(in);
-    	org.dom4j.Element root = doc.getRootElement();
-    	System.out.println(root.element("sql").asXML());
-    }
-	
+	public static void testDom4j() throws DocumentException {
+		SAXReader reader = new SAXReader();
+		InputStream in = TestSQLUnion.class.getClassLoader()
+				.getResourceAsStream(xml_uri);
+		org.dom4j.Document doc = reader.read(in);
+		org.dom4j.Element root = doc.getRootElement();
+		System.out.println(root.element("sql").asXML());
+	}
+
 	@Test
 	public void testSQLPool() {
-		String sql = SQLPool.getSQL(TestSQLUnion.class.getClassLoader()
-				.getResource(xml_uri), "find_subjects");
-		System.out.println(sql.trim());
+			long begin = System.currentTimeMillis();
+			String sql = SQLPool.getSQL(TestSQLUnion.class.getClassLoader()
+					.getResource(xml_uri), "find_subjects");
+			long end = System.currentTimeMillis();
+			System.out.println(end - begin);
+			System.out.println(sql);
 	}
 
 	// 重写对自己感兴趣的事件处理方法
@@ -218,7 +222,7 @@ public class TestSQLUnion {
 		public void characters(char[] ch, int start, int length)
 				throws SAXException {
 			super.characters(ch, start, length);
-			 System.out.println(new String(ch,start,length));  
+			System.out.println(new String(ch, start, length));
 		}
 
 		@Override

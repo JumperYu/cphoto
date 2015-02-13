@@ -60,7 +60,7 @@ public class BaseDAOImpl implements BaseDAO {
 	public List<Map<String, Object>> queryForList(String sql, Object... args) {
 		return jdbcTemplate.queryForList(sql, args);
 	}
-	
+
 	@Override
 	public <T> List<T> queryForEntity(RowMapper<T> rowMapper, String sql,
 			Object... args) {
@@ -81,16 +81,15 @@ public class BaseDAOImpl implements BaseDAO {
 	public List<List<Object>> queryForArrays(String sql, Object... args) {
 		final List<List<Object>> arrays = new ArrayList<List<Object>>();
 		jdbcTemplate.query(sql, args, new RowCallbackHandler() {
+			// 不需要手动调用rs.next
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
-				while (rs.next()) {
-					List<Object> row = new ArrayList<Object>();
-					int count = rs.getMetaData().getColumnCount();
-					for (int col = 1; col <= count; col++) {
-						row.add(rs.getObject(col));
-					}
-					arrays.add(row);
+				List<Object> row = new ArrayList<Object>();
+				int count = rs.getMetaData().getColumnCount();
+				for (int col = 1; col <= count; col++) {
+					row.add(rs.getObject(col));
 				}
+				arrays.add(row);
 			}
 		});
 		return arrays;
@@ -114,12 +113,25 @@ public class BaseDAOImpl implements BaseDAO {
 		jdbcTemplate.execute(sql);
 	}
 
+	// hack.20150210
 	public int findIntBySql(String sql, Object... args) {
-		return jdbcTemplate.queryForObject(sql, args, Integer.class);
+		// return jdbcTemplate.queryForObject(sql, args, Integer.class);
+		// 后期需要改进下
+		List<List<Object>> result = queryForArrays(sql, args);
+		if (result != null && result.size() > 0 && result.get(0).size() == 1)
+			return Integer.parseInt(result.get(0).get(0).toString());
+		else
+			return 0;
 	}
 
+	// hack.20150210
 	public String findStringBySql(String sql, Object... args) {
-		return jdbcTemplate.queryForObject(sql, args, String.class);
+		// return jdbcTemplate.queryForObject(sql, args, String.class);
+		List<List<Object>> result = queryForArrays(sql, args);
+		if (result != null && result.size() > 0 && result.get(0).size() == 1)
+			return result.get(0).get(0).toString();
+		else
+			return "";
 	}
 
 	public void save(String sql) {

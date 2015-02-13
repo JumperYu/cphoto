@@ -35,7 +35,6 @@ public class SQLPool {
 		String sql = "";
 		try {
 			Document doc = XMLTools.parseDocument(url);
-			//XMLTools.printDom(doc.getDocumentElement());
 			Element node = doc.getElementById(id);
 			if (node != null) {
 				sql = node.getLastChild().getNodeValue();
