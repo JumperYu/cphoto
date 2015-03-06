@@ -3,9 +3,11 @@ package com.cp.form;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import org.junit.Test;
 
+import com.cp.utils.DateUtils;
 import com.cp.utils.HttpRequestUtil;
 
 public class TestOther {
@@ -35,4 +37,10 @@ public class TestOther {
 		System.out.println(Math.pow(2, 8));
 	}
 	
+	@Test
+	public void testTime(){
+		Date now =  DateUtils.strToTime("2015-03-03 00:00:00");
+		Date ye = DateUtils.strToTime("2015-01-19 00:00:00");
+		System.out.println((now.getTime() - ye.getTime()) / (DateUtils.SECONDS_IN_DAY * 1000));
+	}
 }

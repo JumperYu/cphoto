@@ -25,7 +25,10 @@ public class DateUtils {
 	public static final long SECONDS_IN_HOUR = 60 * 60;
 	public static final long SECONDS_IN_DAY = 60 * 60 * 24;
 	public static final long SECONDS_IN_WEEK = 60 * 60 * 24 * 7;
-		
+	
+	/* 默认时间格式 */
+	public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
 	/**
 	 * 获取偏移当前天的开始时间 如 2015-01-05 00:00:00
 	 * 
@@ -79,7 +82,7 @@ public class DateUtils {
 	 * 获取当天的格式化时间
 	 * 
 	 * @param pattern
-	 *            YYYMMdd HH:mm:ss
+	 *            yyyyMMdd HH:mm:ss
 	 * @return String
 	 */
 	public static String getDateStr(String pattern) {
@@ -96,7 +99,7 @@ public class DateUtils {
 	 * @throws ParseException
 	 */
 	public static Date strToTime(String time) {
-		return strToTime(time, "YYYY-MM-dd HH:mm:ss");
+		return strToTime(time, DEFAULT_DATETIME_FORMAT);
 	}
 
 	/**
@@ -126,7 +129,7 @@ public class DateUtils {
 	 * @return
 	 */
 	public static String timeToString(Date date) {
-		return timeToString(date, "yyyy-MM-dd HH:mm:ss");
+		return timeToString(date, DEFAULT_DATETIME_FORMAT);
 	}
 
 	/**
