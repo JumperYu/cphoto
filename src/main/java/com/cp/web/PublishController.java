@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cp.entity.Page;
 import com.cp.entity.Subject;
 import com.cp.photo.service.PhotoService;
 import com.cp.subject.service.SubjectService;
@@ -51,6 +52,12 @@ public class PublishController {
 
 	@Resource
 	private PhotoService photoService;
+
+	// 网页接口
+	@RequestMapping("/circle/index")
+	public String toCircleFriends(int userid) {
+		return "circle";
+	}
 
 	// 发表一个主题
 	@RequestMapping(value = "/add_subject", method = RequestMethod.POST)
@@ -162,21 +169,18 @@ public class PublishController {
 
 	@RequestMapping("/list_subjects")
 	@ResponseBody
-	public Map<String, Object> reqUserSubjects(HttpServletRequest request) {
-		Servlets.printHeaderWithHttpRequest(request); // --> print header
-		Map<String, Object> params = Servlets.getBodyWihtHttpRequest(request); // -->
+	public Map<String, Object> reqUserSubjects(int userid, Page page) {
 
 		Map<String, Object> modelMap = new HashMap<String, Object>();
-
-		List<Subject> subs = subjectService.getSubject(Integer
-				.parseInt(Servlets.ignoreStringNull(params.get("userid"))));
+		
+/*		List<Subject> subs = subjectService.getSubject(userid);
 		if (subs != null && subs.size() > 0) {
 			modelMap.put("ret", 1);
 			modelMap.put("subjects", subs);
 		} else {
 			modelMap.put("ret", 0);
 			modelMap.put("subjects", null);
-		}
+		}*/
 		return modelMap;
 	}
 

@@ -9,7 +9,7 @@
 </head>
 <body>
 	<div id="nav">
-		<a href="/static/">返回首页</a> <a href="">朋友圈</a>
+		<a href="/v2_1/index?userid=${userid}">返回首页</a> <a href="">朋友圈</a>
 	</div>
 	<div id="search-div">
 		<div>

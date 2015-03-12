@@ -14,10 +14,146 @@ where t1.userid=t2.cp_relatedid and t2.cp_userid='1422518896';
 select b.msgid,b.eventid, a.nickname,a.userid,a.sex from cp_account a, push_msg b
 where a.userid=b.ori_userid and b.eventid='1001' and b.tar_userid='1422524281' and b.state='0';
 
+-- 查询自己的主题
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time 
+FROM
+	cp_subject a,
+	cp_picture b
+WHERE
+	a.userid = '1422524281'
+AND a.pictureid = b.id
+AND a.userid = b.userid
+ORDER BY
+	a.create_time DESC;
 
 
+-- 查询参与的主题
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time
+FROM
+	cp_subject a,
+	cp_picture b
+WHERE
+	a.pictureid = b.id
+AND EXISTS (
+	SELECT
+		c.subjectid
+	FROM
+		cp_reply c
+	WHERE
+		b.userid = '1422524281'
+	AND a.id = c.subjectid
+)
+ORDER BY
+	a.create_time DESC;
 
+-- 查出朋友的帖子
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time
+FROM
+	cp_subject a,
+	cp_picture b
+WHERE
+	a.pictureid = b.id
+AND EXISTS (
+	SELECT
+		t.cp_relatedid
+	FROM
+		cp_friendship t
+	WHERE
+		t.cp_userid = '1422524281'
+	AND a.userid = t.cp_relatedid
+)
+ORDER BY
+	a.create_time DESC;
 
+	
+-- 查看帖子联结sql
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time
+FROM
+	cp_subject a,
+cp_picture b
+WHERE
+	a.pictureid = b.id
+AND a.userid = b.userid 
+and a.id IN (
+	SELECT
+		a.id
+	FROM
+		cp_subject a,
+		cp_picture b
+	WHERE
+		a.userid = '1422524281'
+	AND a.pictureid = b.id
+	AND a.userid = b.userid
+	UNION ALL
+		SELECT
+			a.id
+		FROM
+			cp_subject a,
+			cp_picture b
+		WHERE
+			a.pictureid = b.id
+		AND EXISTS (
+			SELECT
+				c.subjectid
+			FROM
+				cp_reply c
+			WHERE
+				b.userid = '1422524281'
+			AND a.id = c.subjectid
+		)
+		UNION ALL
+			SELECT
+				a.id
+			FROM
+				cp_subject a,
+				cp_picture b
+			WHERE
+				a.pictureid = b.id
+			AND EXISTS (
+				SELECT
+					t.cp_relatedid
+				FROM
+					cp_friendship t
+				WHERE
+					t.cp_userid = '1422524281'
+				AND a.userid = t.cp_relatedid
+			)
+);
 
-
-
+	

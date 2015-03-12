@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cp.cache.SpyClient;
 import com.cp.constant.MessageBox;
-import com.cp.constant.PushMessage;
 import com.cp.entity.Event;
 import com.cp.msg.MessageService;
 import com.cp.photo.service.PhotoService;
@@ -51,7 +50,7 @@ public class LoginControllerV2_1 {
 
 	//private static String uploadPath = "/pics/";
 	// private static String uploadPath = "d:/pics/";
-
+	
 	@Resource
 	private UserService userService;
 
@@ -60,7 +59,14 @@ public class LoginControllerV2_1 {
 
 	@Resource
 	private MessageService messageService;
-
+	
+	// 页面接口
+	@RequestMapping("/index")
+	public String index(int userid, Map<String, Object> context){
+		context.putAll(userService.findUserByUserid(userid));
+		return "index";
+	}
+	
 	// 注册接口
 	@RequestMapping("/register")
 	@ResponseBody
@@ -269,7 +275,7 @@ public class LoginControllerV2_1 {
 	// 搜索ren
 	@RequestMapping(value = "/find_user")
 	@ResponseBody
-	public Map<String, Object> searchUser(String userid) {
+	public Map<String, Object> searchUser(int userid) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		modelMap.put("ret", 1);
 		modelMap.put("info", userService.findUserByUserid(userid));

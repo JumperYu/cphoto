@@ -19,7 +19,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("baseDAO")
 public class BaseDAOImpl implements BaseDAO {
 	private JdbcTemplate jdbcTemplate;
 

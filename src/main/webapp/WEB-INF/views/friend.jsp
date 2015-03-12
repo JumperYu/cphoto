@@ -9,7 +9,7 @@
 </head>
 <body>
 	<div id="nav">
-		<a href="/static/">返回首页</a> <a href="">朋友圈</a> <a href="">添加好友</a>
+		<a href="/v2_1/index?userid=${userid}">返回首页</a> <a href="/v2_1/friends/add?userid=${userid}">添加好友</a>
 	</div>
 	<div>
 		<c:forEach items="${users}" var="user">

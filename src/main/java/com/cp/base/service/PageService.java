@@ -11,15 +11,17 @@ import com.cp.base.dao.PageDAO;
  * @author zengxm 2015年01月08日
  * 
  */
-@Service
+@Service("pageService")
 public class PageService {
 
 	private PageDAO pageDAO;
-	
-	@Resource
+
+	@Resource(name = "pageDAO")
 	public void setPageDAO(PageDAO pageDAO) {
 		this.pageDAO = pageDAO;
 	}
-	
 
+	public PageDAO getPageDAO() {
+		return pageDAO;
+	}
 }

@@ -46,7 +46,7 @@ public class TestForm {
 	@Before
 	public void testLogin() {
 		String param = "account=xiaoyu&password=123";
-		String body = HttpRequestUtil.httpRequest("GET", release_domain
+		String body = HttpRequestUtil.httpRequest("GET", local_domain
 				+ "/v2_1/login", param, null);
 		JSONObject jsb = new JSONObject(body);
 		sessionid = jsb.getJSONObject("session").getString("sessionid");
@@ -63,7 +63,7 @@ public class TestForm {
 			String filepath = "E:\\logo6.png";
 			String filename = "ok.jpg";
 
-			targetURL = release_domain + "/v2_1/add_subject";
+			targetURL = local_domain + "/v2_1/add_subject";
 			// targetURL = "http://localhost:8080/cphoto/v2_1/add_subject";
 
 			CloseableHttpClient httpclient = HttpClients.createDefault();

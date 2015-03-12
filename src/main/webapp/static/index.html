@@ -39,7 +39,7 @@
 									+ "<span>年龄 : "+ result.account.age + "</span>"
 								    + "</div>";
 						var div_down = "<div>"
-						+ "<a href=\"\">朋友圈</a> <a href=\"/v2_1/friends/list?userid=" + result.account.userid + "\">我的好友</a> <a href=\"/v2_1/friends/add?userid=" + result.account.userid  + "\">添加好友</a>"
+						+ "<a href=\"/v2_1/circle/index?userid=" + result.account.userid + "\">朋友圈</a> <a href=\"/v2_1/friends/list?userid=" + result.account.userid + "\">我的好友</a> <a href=\"/v2_1/friends/add?userid=" + result.account.userid  + "\">添加好友</a>"
 						+ "</div><hr>";
 						$("#person").show().html(div_up + div_down);
 						// 开启轮询
