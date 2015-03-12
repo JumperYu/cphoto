@@ -36,7 +36,7 @@ public class PictureIO {
 		File fileDir = new File(dir);
 
 		if (!fileDir.exists()) {
-			fileDir.mkdir();
+			fileDir.mkdirs();
 		}// create dir if not exists
 
 		File destination = new File(fileDir, fileName);
@@ -64,7 +64,7 @@ public class PictureIO {
 		File fileDir = new File(dir);
 
 		if (!fileDir.exists()) {
-			fileDir.mkdir();
+			fileDir.mkdirs();
 		}// create dir if not exists
 
 		File destination = new File(fileDir, fileName);

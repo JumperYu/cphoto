@@ -1,10 +1,6 @@
 package com.cp.web;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -13,44 +9,39 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.cp.cache.SpyClient;
 import com.cp.constant.MessageBox;
-import com.cp.entity.Event;
+import com.cp.entity.UserAccount;
 import com.cp.msg.MessageService;
 import com.cp.photo.service.PhotoService;
 import com.cp.user.service.UserService;
 
 /**
  * 
+ * 登陆、注册控制层
+ * 
  * @author zengxm 2014年11月05日
  * 
- *         V2.1.0
+ *         V2.2.0
  * 
- * @edit at 2014-11-24 模仿OAuth2.0协议
+ * @edit at 2014-11-24 实现session通用化
  * @edit at @date 2014-11-29 完善好友功能
+ * @edit at @date 2015-02-06 完善模块划分
  * 
  */
 @Controller
 @RequestMapping("/v2_1")
-public class LoginControllerV2_1 {
+public class LoginController {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(LoginControllerV2_1.class);
+			.getLogger(LoginController.class);
 
-	//private static String uploadPath = "/pics/";
-	// private static String uploadPath = "d:/pics/";
-	
 	@Resource
 	private UserService userService;
 
@@ -59,55 +50,56 @@ public class LoginControllerV2_1 {
 
 	@Resource
 	private MessageService messageService;
-	
+
 	// 页面接口
 	@RequestMapping("/index")
-	public String index(int userid, Map<String, Object> context){
-		context.putAll(userService.findUserByUserid(userid));
+	public String index(Integer userid, Map<String, Object> context, HttpServletRequest request) {
+		if(userid == null) {
+			HttpSession session = request.getSession(false);
+			if(session != null) {
+				Object session_userid = session.getAttribute("userid");
+				if(session_userid != null && session_userid instanceof String) {
+					userid = Integer.valueOf(session_userid.toString());
+				}
+			}
+		}
+		if(userid != null) {
+			context.putAll(userService.findUserByUserid(userid));
+		} else {
+			log.error("request index page with no correct identity");
+		}
 		return "index";
 	}
-	
+
 	// 注册接口
 	@RequestMapping("/register")
 	@ResponseBody
-	public Map<Object, Object> register(HttpServletRequest request) {
+	public Map<Object, Object> register(HttpServletRequest request, UserAccount user) {
 
-		Map<String, Object> params = Servlets.getParametersStartingWith(
-				request, "");
-		log.debug("register request: " + params.toString());
+		Servlets.printBodyWihtHttpRequest(request);
 
-		String account = params.get("account").toString();
-		String password = params.get("password").toString();
-		String nickname = params.get("nickname").toString();
-		String gender = params.get("gender").toString();
-		String age = params.get("age").toString();
-		String email = params.get("email").toString();
-		String telphone = params.get("telphone").toString();
-
-		String cphoto = ""
-				+ (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 100);
-
-		boolean isExits = userService.isAccountExits(account);
+		boolean isExits = userService.isAccountExits(user.getAccount());
+		
+		String userid = String.valueOf(TimeUnit.MICROSECONDS.toSeconds(System.currentTimeMillis()));
+		user.setUserid(userid);
+		
 		Map<Object, Object> modelMap = new HashMap<Object, Object>();
 		if (!isExits) {
-			userService.register(cphoto, account, password, nickname, gender,
-					age, email, telphone);
+			/*int ret = */
+			userService.register(user);
 			modelMap.put("ret", WebResultConstant.REGISTER_SUCCESS_RET);
 			modelMap.put("msg", WebResultConstant.REGISTER_SUCCESS_MSG);
-			Map<Object, Object> usr = new HashMap<Object, Object>();
-			usr.put("cphoto", cphoto); // 兼容以前
-			usr.put("userid", cphoto); //
-			usr.put("nickname", nickname);
-			usr.put("gender", gender);
-			usr.put("age", age);
-			usr.put("email", email);
-			usr.put("telphone", telphone);
-			modelMap.put("usr", usr);
+			modelMap.put("account", user);
 			modelMap.put("success", true);
+			
+			// --> put userid:sessionid in memcached
+			String token = UUID.randomUUID().toString();
+			SpyClient.set(user.getUserid(), token);
+			request.getSession().setAttribute("userid", user.getUserid());
 		} else {
 			modelMap.put("ret", WebResultConstant.REGISTER_FAIL_RET);
 			modelMap.put("msg", WebResultConstant.REGISTER_FAIL_MSG);
-			modelMap.put("usr", new Object[] {});
+			modelMap.put("account", new Object[] {});
 			modelMap.put("success", false);
 		}// -->> End if
 
@@ -117,12 +109,11 @@ public class LoginControllerV2_1 {
 	// 登录接口
 	@RequestMapping("/login")
 	@ResponseBody
-	public Map<Object, Object> login(
-			@RequestParam(required = true) String account,
-			@RequestParam(required = true) String password,
-			HttpServletRequest request) {
-		Servlets.printHeaderWithHttpRequest(request);
-		Servlets.printBodyWihtHttpRequest(request);
+	public Map<Object, Object> login(HttpServletRequest request) {
+		// 暂不做非空校验
+		Map<String, Object> params = Servlets.getBodyWihtHttpRequest(request);
+		String account = params.get("account").toString();
+		String password = params.get("password").toString();
 
 		HttpSession session = request.getSession(true);// new session every time
 		session.setMaxInactiveInterval(60 * 30);// 存活30分钟
@@ -138,13 +129,13 @@ public class LoginControllerV2_1 {
 			modelMap.put("account", accountMap);
 			modelMap.put("success", true);// ext form need
 
-			// --> put token and session in result
+			// --> put token and session to client
 			String token = UUID.randomUUID().toString();
 			Map<Object, Object> access_token = new HashMap<Object, Object>();
-			access_token.put("token", token);
-			access_token.put("expires_in", SpyClient.DEFAULT_SECONDS);
+			access_token.put("token", token);// 长时间持有token
+			access_token.put("expires_in", SpyClient.DEFAULT_SECONDS);// 失效时间:秒
 			Map<Object, Object> sessionMap = new HashMap<Object, Object>();
-			sessionMap.put("sessionid", session.getId());
+			sessionMap.put("sessionid", session.getId());// 短时间持有session
 			sessionMap.put("expires_in", session.getMaxInactiveInterval());// 失效时间:秒
 
 			modelMap.put("access_token", access_token);
@@ -159,18 +150,15 @@ public class LoginControllerV2_1 {
 			modelMap.put("msg", MessageBox.Message.CP_LOGIN_FAIL.getMsg());
 			modelMap.put("account", new HashMap<Object, Object>());
 			modelMap.put("success", false); // ext form need
-		}
+		}// end if account exists
 		return modelMap;
 	}
 
-	// access_token换session
+	// 当session失效后 可使用access_token换取新session
 	@RequestMapping("/token")
 	@ResponseBody
 	public Map<Object, Object> token(HttpServletRequest request) {
-		Map<String, Object> params = Servlets.getParametersStartingWith(
-				request, "");
-		log.debug(String.format("request %s, params:%s",
-				request.getRequestURI(), params.toString()));
+		Map<String, Object> params = Servlets.getBodyWihtHttpRequest(request);
 
 		Object token = params.get("token");
 		Object userid = params.get("userid");
@@ -181,7 +169,8 @@ public class LoginControllerV2_1 {
 		Map<Object, Object> modelMap = new HashMap<Object, Object>();
 		if (token != null && userid != null) {
 			Object cached_token = SpyClient.get(userid.toString());
-			if (cached_token != null && token.equals(cached_token.toString())) {
+			if (cached_token != null && cached_token instanceof String
+					&& token.equals(cached_token.toString())) {
 				modelMap.put("ret", MessageBox.Message.CP_REQ_SUCS.getRet());
 				modelMap.put("msg", MessageBox.Message.CP_REQ_SUCS.getMsg());
 
@@ -200,12 +189,9 @@ public class LoginControllerV2_1 {
 				session.setAttribute("userid", userid);
 
 				modelMap.put("success", true);// ext form need
-
 				return modelMap;
-
 			}
-		}
-		// --> else
+		}// end if
 		modelMap.put("ret", MessageBox.Message.CP_LOGIN_FAIL.getRet());
 		modelMap.put("msg", MessageBox.Message.CP_LOGIN_FAIL.getMsg());
 		modelMap.put("success", false); // ext form need
@@ -214,7 +200,7 @@ public class LoginControllerV2_1 {
 	}
 
 	// 上传
-	@RequestMapping(value = "/publish", method = RequestMethod.POST)
+/*	@RequestMapping(value = "/publish", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<Object, Object> publish(@RequestParam("title") String title,
 			@RequestParam("content") String content,
@@ -252,9 +238,9 @@ public class LoginControllerV2_1 {
 		modelMap.put("ret", ret);
 		modelMap.put("msg", msg);
 		return modelMap;
-	}
+	}*/
 
-	// 返回所有用户的图片
+/*	// 返回所有用户的图片
 	@RequestMapping(value = "/list_pics")
 	@ResponseBody
 	public Map<Object, Object> listPics(HttpServletRequest request) {
@@ -269,68 +255,6 @@ public class LoginControllerV2_1 {
 		Map<Object, Object> modelMap = new HashMap<Object, Object>();
 		modelMap.put("pics", photoService.findAllPics(userid));
 		return modelMap;
-	}
-
-
-	// 搜索ren
-	@RequestMapping(value = "/find_user")
-	@ResponseBody
-	public Map<String, Object> searchUser(int userid) {
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		modelMap.put("ret", 1);
-		modelMap.put("info", userService.findUserByUserid(userid));
-		return modelMap;
-	}
-
-	/**
-	 * 多功能更搜索
-	 * 
-	 * @param method
-	 *            [FIND_USERS]
-	 * @param request
-	 * @return Map info
-	 */
-	@RequestMapping(value = "/search")
-	@ResponseBody
-	public Map<String, Object> search(String method, int userid,
-			HttpServletRequest request) {
-		Map<String, Object> params = Servlets.getParametersStartingWith(
-				request, "");
-		log.debug(String.format("request %s, params:%s",
-				request.getRequestURI(), params.toString()));
-
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		if (StringUtils.isNotEmpty(method) && method.equals("FIND_USERS")) {
-			String query = Servlets.ignoreStringNull(params.get("query"));
-			modelMap.put("ret", 1);
-			modelMap.put("info", userService.findUsersBy(query, userid));
-		} else {
-			modelMap.put("ret", -1);
-			modelMap.put("info", new Object[] {});
-		}
-		return modelMap;
-	}
-
-	// 搜索好友
-	@RequestMapping("/friends")
-	@ResponseBody
-	public List<List<Object>> searchFriendsArray(
-			@RequestParam(required = true) String userid) {
-		return userService.getFriendsArry(userid);
-	}
-
-	@RequestMapping(value = "/long_poll")
-	@ResponseBody
-	public Map<String, Object> longPoll(int userid) {
-		List<Event> events = messageService.getEventMsg(userid);
-		Map<String, Object> modelMap = new HashMap<String, Object>();
-		if (events != null && events.size() > 0) {
-			modelMap.put("ret", 1);
-			modelMap.put("events", events);
-		}/*
-		 * else { modelMap.put("ret", 0); modelMap.put("events", null); }
-		 */
-		return modelMap;
-	}
+	}*/
 
 }

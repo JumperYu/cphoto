@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cp.base.service.BaseService;
 import com.cp.constant.PushMessage;
+import com.cp.entity.UserAccount;
 
 /**
  * 用户相关业务
@@ -133,11 +134,12 @@ public class UserService extends BaseService {
 	 * 
 	 * @return 是否成功
 	 */
-	public void register(String userid, String account, String password,
-			String nickname, String gender, String age, String email,
-			String telphone) {
-		getBaseDAO().insert(REGISTER_USER_SQL, nickname, gender, age, email,
-				telphone, userid, account, password);
+	public int register(UserAccount user) {
+		int ret = getBaseDAO().insert(REGISTER_USER_SQL, user.getNickname(),
+				user.getSex(), user.getAge(), user.getEmail(),
+				user.getTelphone(), user.getUserid(), user.getAccount(),
+				user.getPassword());
+		return ret;
 		// addGroup(userid, "1", "default");// every one got the default group
 	}
 
@@ -191,7 +193,8 @@ public class UserService extends BaseService {
 	 * 按名字查找
 	 * 
 	 * @param nickname
-	 * @param userid   除了自己的userid
+	 * @param userid
+	 *            除了自己的userid
 	 * @return
 	 */
 	public List<Map<String, Object>> findUsersBy(String nickname, int userid) {

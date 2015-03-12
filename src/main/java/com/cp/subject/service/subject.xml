@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sql-union SYSTEM "file:E:\work\workspace\hoolai\cphoto\src\main\resources\dtd\sql-union.dtd ">
+<sql-union>
+<sql id="find_subjects" desc="分页查找主题,我的主题、我参与过的主题、朋友的主题">
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	a.userid,
+	a.nickname,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_time
+FROM
+	cp_subject a,
+	cp_picture b
+WHERE
+	a.pictureid = b.id
+AND a.userid = b.userid
+AND a.id IN (
+	SELECT
+		a.id
+	FROM
+		cp_subject a,
+		cp_picture b
+	WHERE
+		a.userid = ?
+	AND a.pictureid = b.id
+	AND a.userid = b.userid
+	UNION ALL
+		SELECT
+			a.id
+		FROM
+			cp_subject a,
+			cp_picture b
+		WHERE
+			a.pictureid = b.id
+		AND EXISTS (
+			SELECT
+				c.subjectid
+			FROM
+				cp_reply c
+			WHERE
+				b.userid = ?
+			AND a.id = c.subjectid
+		)
+		UNION ALL
+			SELECT
+				a.id
+			FROM
+				cp_subject a,
+				cp_picture b
+			WHERE
+				a.pictureid = b.id
+			AND EXISTS (
+				SELECT
+					t.cp_relatedid
+				FROM
+					cp_friendship t
+				WHERE
+					t.cp_userid = ?
+				AND a.userid = t.cp_relatedid
+			)
+)
+</sql>
+<sql id="find_replies" desc="分页查找主题下的回帖">
+SELECT
+	a.id,
+	a.title,
+	a.content,
+	a.userid,
+	a.nickname,
+	unix_timestamp(a.create_time) create_time,
+	unix_timestamp(a.update_time) updae_time,
+	b.pic_name,
+	b.pic_url,
+	b.content_type,
+	unix_timestamp(b.update_time) pic_update_timeFROM cp_reply a,
+	cp_picture bWHERE a.pictureid = b.idAND a.userid = b.userid
+AND a.subjectid =?
+</sql>
+<sql id="find_coms" desc="查找对应主题的评论">
+SELECT
+	id,
+	content,
+	subjectid,
+	replyid,
+	userid,
+	nickname,
+	UNIX_TIMESTAMP(create_time) create_time,
+	UNIX_TIMESTAMP(update_time) update_time
+FROM
+	cp_comment
+WHERE
+	subjectid = ?
+ORDER BY
+	create_time DESC
+</sql>
+</sql-union>

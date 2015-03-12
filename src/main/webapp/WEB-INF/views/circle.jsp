@@ -10,10 +10,17 @@
 p {
 	text-align: left;
 }
+div {
+margin: 5px 0;
+}
 </style>
 <script src="/static/jquery/jquery-2.1.3.min.js" type="text/javascript"></script>
+<script src="/static/app/showtime.js" type="text/javascript"></script>
 </head>
 <body>
+	<div id="nav">
+		<a href="/v2_1/index?userid=${userid}">返回首页</a>
+	</div>
 	<div>
 		<fieldset title="发布主题">
 		<form action="/v2_1/add_subject" method="post" enctype="multipart/form-data">
@@ -25,47 +32,62 @@ p {
 		</form>
 		</fieldset>
 	</div>
+	<p style=''><a id="up" href="javascript:void(0);">点击更新</a></p>
 	<ol></ol>
+	<p style=''><a id="down" href="javascript:void(0);">点击更多</a></p>
 	<script type="text/javascript">
+		var _userid = "${userid}", _index = 1, _count = 100, timeline = 0; // 总页数
+	
 		$(function() {
-			var $body = $("body");
-			var $div = $("ol");
-			var $update = "<p style=''><a href=\"javascript:void();\">点击更换新</a></p>";
-			for (var i = 0; i < 10; i++) {
-				var $img = "<p><img src=\"http://image.bradypod.com/cphoto/20150124/1422092980.jpg\" width=\"300\" height=\"100\"/></p>";
-				var $author = "<p>作者:小鱼  这是标题   一分钟前 </p>";
-				var $zan = "<p>10个人赞过:@小鱼1、@小鱼2、@小鱼3等</p>";
-				var $comment = "<p>评论数:2</p><p>@小鱼1: 啊哈</p><p>@小鱼2: 啊哈</p><p>@小鱼2: 啊哈</p><p>等等</p><hr/>";
-				$div.append("<li>").append($img).append($author).append($zan)
-						.append($comment).append("</li>");
-			}
-			$body.append($update);
-			$("a")
-					.on(
-							'click',
-							function(e) {
-								delta = 3;
-								for (var i = 0; i < delta; i++) {
-									var $img = "<p><img src=\"http://image.bradypod.com/cphoto/20150124/1422092980.jpg\" width=\"300\" height=\"100\"/></p>";
-									var $author = "<p>作者:小鱼  这是标题   一分钟前 </p>";
-									var $zan = "<p>10个人赞过:@小鱼1、@小鱼2、@小鱼3等</p>";
-									var $comment = "<p>评论数:2</p><p>@小鱼1: 啊哈</p><p>@小鱼2: 啊哈</p><p>@小鱼2: 啊哈</p><p>等等</p><hr/>";
-									$div.append("<li>").append($img).append(
-											$author).append($zan).append(
-											$comment).append("</li>");
-								}
-							});
+			loadNextPage(_index);
+			$(document).on('click', "a", function(e) {
+				var $a = $(this);
+				if($a.attr("id") == "up"){
+					var subjectid = $("ol li").first().find("input").first().val();
+					var timeline = $("ol li").first().find("input").last().val();
+					loadNextPage(_index, subjectid, timeline, "uptodate");	
+				} else {
+					var subjectid = $("ol li").last().find("input").first().val();
+					var timeline = $("ol li").last().find("input").last().val();
+					loadNextPage(_index, subjectid, timeline, "last");
+				}
+				//
+			});
 		});
-		// 分页展示
-		function listPage(pageNo, pageSize) {
+		function loadNextPage(pageIndex, subjectid, timeline, method) {
 			$.ajax({
 				type : "GET",
-				url : "/v2_1/find_users",
+				url : "/v2_1/list_subjects",
 				data : {
-					nickname : encodeURIComponent($("#content").val()),
-					userid :  "${userid}"
+					userid : _userid,
+					subjectid : subjectid,
+					timeline : timeline,
+					method : method,
+					index : pageIndex
 				},
 				success : function(result) {
+					//var $body = $("body");
+					var $div = $("ol");
+					if(!result.subjects || result.subjects.length <= 0)
+							alert("没有更多的数据了");
+					if(result.ret && result.ret == 1) {
+						$.each(result.subjects, function(i, n){
+							var $img = "<li><p><img src=\"" + n.pic_url + "?300x300" + "\" width=\"300\" height=\"100\"/></p>";
+							var $author = "<p>作者:<b>@" + n.nickname  + "    </b><b>" + n.title  + "</b>  <b>" + showtime(n.create_time) + "</b></p>";
+							console.log(n);
+							var $zan = "<p>10个人赞过:@小鱼1、@小鱼2、@小鱼3等</p>";
+							var $comment = "<p>评论数:" + n.comments_page.count  + "</p>";
+							var $input = "<input type='hidden' value='" + n.id + "' />" + "<input type='hidden' value='" + n.create_time + "' />" + "</li>";
+							$.each(n.comments, function(j, m) {
+								$comment += "<p>@" + m.nickname + " : " + m.content + "</p>";
+							});
+							if(method == "uptodate")
+								$div.prepend($img + $author + $zan + $comment + $input);
+							else
+								$div.append($img + $author + $zan + $comment + $input);
+						});
+						
+					}
 					
 				}
 			});

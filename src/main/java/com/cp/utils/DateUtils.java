@@ -20,6 +20,15 @@ public class DateUtils {
 		System.out.println(DateUtils.strToTime("2010-01-01 00:00:00"));
 	}
 
+	/* 一分钟的秒数、一小时的秒数、一天的秒数 */
+	public static final long SECONDS_IN_MIN = 60;
+	public static final long SECONDS_IN_HOUR = 60 * 60;
+	public static final long SECONDS_IN_DAY = 60 * 60 * 24;
+	public static final long SECONDS_IN_WEEK = 60 * 60 * 24 * 7;
+	
+	/* 默认时间格式 */
+	public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
 	/**
 	 * 获取偏移当前天的开始时间 如 2015-01-05 00:00:00
 	 * 
@@ -54,13 +63,26 @@ public class DateUtils {
 		return todayEnd.getTime();
 	}
 
+	/* 从一个时间点获取前几天后几天 */
+	public static Date getDate(long time) {
+		return new Date(time);
+	}
+
+	public static Date getDate(long time, int dayOffset) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(getDate(time));
+		calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DATE)
+				+ dayOffset);
+		return calendar.getTime();
+	}
+
 	// ------------->> 以下获取时间的格式化字符串
 
 	/**
 	 * 获取当天的格式化时间
 	 * 
 	 * @param pattern
-	 *            YYYMMdd HH:mm:ss
+	 *            yyyyMMdd HH:mm:ss
 	 * @return String
 	 */
 	public static String getDateStr(String pattern) {
@@ -71,19 +93,22 @@ public class DateUtils {
 	/**
 	 * 字符串转时间
 	 * 
-	 * @param time 时间字符串
+	 * @param time
+	 *            时间字符串
 	 * @return
 	 * @throws ParseException
 	 */
 	public static Date strToTime(String time) {
-		return strToTime(time, "YYYY-MM-dd HH:mm:ss");
+		return strToTime(time, DEFAULT_DATETIME_FORMAT);
 	}
 
 	/**
 	 * 字符串转时间
 	 * 
-	 * @param time	      时间
-	 * @param pattern 格式	
+	 * @param time
+	 *            时间
+	 * @param pattern
+	 *            格式
 	 * @return
 	 * @throws ParseException
 	 */
@@ -95,5 +120,37 @@ public class DateUtils {
 			e.printStackTrace();
 		}
 		return date;
+	}
+
+	/**
+	 * 时间转换为字符串
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static String timeToString(Date date) {
+		return timeToString(date, DEFAULT_DATETIME_FORMAT);
+	}
+
+	/**
+	 * 时间转换为字符串
+	 * 
+	 * @param date
+	 * @param pattern
+	 *            指定格式
+	 * @return
+	 */
+	public static String timeToString(Date date, String pattern) {
+		return new SimpleDateFormat(pattern).format(date);
+	}
+
+	/**
+	 * 已失效多少天
+	 * 
+	 * @return
+	 */
+	public static long expiresIn(long timeseconds) {
+		long interval = new Date().getTime() / 1000 - timeseconds;
+		return interval / SECONDS_IN_DAY;
 	}
 }

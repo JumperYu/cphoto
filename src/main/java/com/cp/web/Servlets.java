@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import com.cp.entity.UserAgent;
 import com.google.common.base.Charsets;
 import com.google.common.net.HttpHeaders;
 
@@ -175,12 +176,57 @@ public class Servlets {
 		return params;
 	}
 
+	// 忽略.toString NullPointer
 	public static String ignoreStringNull(Object var) {
 		if (var != null && var instanceof String)
 			return (String) var;
 		else {
 			log.error("calling ignoreStringNull function error, beacause object is not a string.");
 			return "";
+		}
+	}
+
+	// 判定请求来源 2015-02-06 还需完善
+	// javascript:var u=navigator.userAgent;
+	// if (u.toLowerCase().indexOf('android') != -1) android else ios
+	public static String whereDoYouCameFrom(HttpServletRequest request) {
+		String agent = "";
+		try {
+			if (getHeaderWihtHttpRequest(request).get("user-agent").toString()
+					.contains(UserAgent.WebPageKey)) {
+				agent = UserAgent.WebPageKey;
+			} else {
+				agent = UserAgent.OtherEnd;
+			}
+		} catch (Exception e) {
+			agent = UserAgent.UnknownKey;
+		}
+		return agent;
+	}
+
+	// GET 方法可以通过request.getQueryString()获取请求串
+	// POST 需要通过request.getParamaterMap()逐个拼接
+	public String getQueryString(HttpServletRequest request) {
+		Map<String, String[]> params = request.getParameterMap();
+		String queryString = "";
+		for (String key : params.keySet()) {
+			String[] values = params.get(key);
+			for (int i = 0; i < values.length; i++) {
+				String value = values[i];
+				queryString += key + "=" + value + "&";
+			}
+		}
+        // 去掉最后一个空格  
+        queryString = queryString.substring(0, queryString.length() - 1);
+		return queryString;
+	}
+
+	// GET获取QueryString
+	public String getQueryString(HttpServletRequest request, String method) {
+		if ("GET".equalsIgnoreCase(method)) {
+			return request.getQueryString();
+		} else {
+			return getQueryString(request);
 		}
 	}
 }

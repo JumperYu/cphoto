@@ -48,8 +48,7 @@ public class HttpRequestUtil {
 	 */
 	public static String httpRequest(String method, String path,
 			String content, Map<String, String> headers) {
-		log.debug("request web path:" + path);
-		log.debug("request web conent:" + content);
+		log.debug("request web path:[" + path + "], content:[" + content + "]");
 		String ret = "";
 		HttpURLConnection conn = null;
 		try {

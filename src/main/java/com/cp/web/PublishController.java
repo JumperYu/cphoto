@@ -20,19 +20,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cp.entity.Page;
-import com.cp.entity.Subject;
 import com.cp.photo.service.PhotoService;
 import com.cp.subject.service.SubjectService;
+import com.cp.user.service.UserService;
 import com.cp.utils.DateUtils;
 import com.cp.utils.PictureIO;
 
 /**
+ * 
+ * 发布、跟帖控制层
  * 
  * @author zengxm 2015年01月05日
  * 
  *         V2.2.0
  * 
  * @update 完善图片的压缩和存放
+ * @update 完善模块 2015-02-06
  * 
  */
 @Controller
@@ -53,12 +56,17 @@ public class PublishController {
 	@Resource
 	private PhotoService photoService;
 
+	@Resource
+	UserService userService;
+
 	// 网页接口
 	@RequestMapping("/circle/index")
 	public String toCircleFriends(int userid) {
 		return "circle";
 	}
-
+	
+	// 数据接口
+	
 	// 发表一个主题
 	@RequestMapping(value = "/add_subject", method = RequestMethod.POST)
 	@ResponseBody
@@ -91,12 +99,14 @@ public class PublishController {
 
 			int picId = photoService.savePic(file.getOriginalFilename(),
 					filePath, contentType, userid, fileUrl);
-
+			/* 查找用户别名 */
+			String nickname = userService.findUserByUserid(userid)
+					.get("nickname").toString();
 			/* int subId = */
 			subjectService.addSubject(
 					Servlets.ignoreStringNull(params.get("title")),
 					Servlets.ignoreStringNull(params.get("content")), picId,
-					userid);
+					userid, nickname);
 
 			msg = WebResultConstant.PUBLISH_SUCCESS_MSG;
 			ret = WebResultConstant.PUBLISH_SUCCESS_RET;
@@ -166,34 +176,70 @@ public class PublishController {
 		modelMap.put("msg", msg);
 		return modelMap;
 	}
-
-	@RequestMapping("/list_subjects")
+	
+	/**
+	 * 分页返回所有相关主题信息
+	 * 
+	 * @param userid
+	 * @param page
+	 * @param timeline
+	 *            时间轴
+	 * @return
+	 */
+	@RequestMapping("/list_subjectid")
 	@ResponseBody
-	public Map<String, Object> reqUserSubjects(int userid, Page page) {
-
+	public Map<String, Object> reqUserSubjectIds(int userid, Page page,
+			Long subjectid, Long timeline, String method) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
-		
-/*		List<Subject> subs = subjectService.getSubject(userid);
+		List<Map<String, Object>> subs = subjectService.listSubjectByPage(
+				userid, subjectid, timeline, method, page);
 		if (subs != null && subs.size() > 0) {
 			modelMap.put("ret", 1);
 			modelMap.put("subjects", subs);
+			modelMap.put("page", page);
 		} else {
 			modelMap.put("ret", 0);
 			modelMap.put("subjects", null);
-		}*/
+		}
+		return modelMap;
+	}
+
+	/**
+	 * 分页返回所有相关主题信息
+	 * 
+	 * @param userid
+	 * @param page
+	 * @param timeline
+	 *            时间轴
+	 * @return
+	 */
+	@RequestMapping("/list_subjects")
+	@ResponseBody
+	public Map<String, Object> reqUserSubjects(int userid, Page page,
+			Long subjectid, Long timeline, String method) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		List<Map<String, Object>> subs = subjectService.listSubjectByPage(
+				userid, subjectid, timeline, method, page);
+		if (subs != null && subs.size() > 0) {
+			modelMap.put("ret", 1);
+			modelMap.put("subjects", subs);
+			modelMap.put("page", page);
+		} else {
+			modelMap.put("ret", 0);
+			modelMap.put("subjects", null);
+		}
 		return modelMap;
 	}
 
 	// 添加一条评论
 	@RequestMapping("/add_comment")
 	@ResponseBody
-	public Map<String, Object> addComment(HttpServletRequest request) {
+	public Map<String, Object> addComment(int userid, HttpServletRequest request) {
 		Servlets.printHeaderWithHttpRequest(request); // --> print header
 		Map<String, Object> params = Servlets.getBodyWihtHttpRequest(request); // -->
 
 		// --> 参数
 		String content = Servlets.ignoreStringNull(params.get("content"));
-		String userid = Servlets.ignoreStringNull(params.get("userid"));
 		String subjectid = "";
 		String replyid = "";
 		if (StringUtils.isEmpty(params.get("subjectid"))) {
@@ -208,9 +254,11 @@ public class PublishController {
 		}
 
 		Map<String, Object> modelMap = new HashMap<String, Object>();
-
-		int ret = subjectService
-				.addComment(content, subjectid, replyid, userid);
+		/* 查找用户别名 */
+		String nickname = userService.findUserByUserid(userid).get("nickname")
+				.toString();
+		int ret = subjectService.addComment(content, subjectid, replyid,
+				userid, nickname);
 
 		modelMap.put("ret", ret > 0 ? 1 : -1);
 		modelMap.put("msg", "added comment");
