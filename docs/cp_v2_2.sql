@@ -19,6 +19,15 @@ create table `cp_account` (
 	KEY INDEX_PWD (`password`)
 )ENGINE=INNODB default charset utf8;
 
+-- 好友关系
+drop table if EXISTS `cp_friendship`;
+create table `cp_friendship` (
+	cp_userid int,
+	cp_relatedid int,
+	cp_groupid int,
+	primary key(cp_userid, cp_relatedid)
+);
+
 -- 主题
 drop table `cp_subject`;
 create table cp_subject(
@@ -49,21 +58,6 @@ create table cp_reply(
 	PRIMARY KEY(id)
 )ENGINE=INNODB default charset utf8;
 
--- 跟帖
-drop table if exists cp_reply;
-create table cp_reply(
-	id int AUTO_INCREMENT,
-	title varchar(60) NOT NULL COMMENT '标题',
-	content varchar(255) NOT NULL COMMENT '主要内容',
-	pictureid int NOT NULL comment '图片id',
-	userid int NOT NULL COMMENT '回帖者id',
-	nickname varchar(30) COMMENT '用户别名',
-	subjectid int NOT NULL COMMENT '主题id',
-	create_time datetime NOT NULL COMMENT '记录时间',
-	update_time datetime DEFAULT NULL COMMENT '更新时间',
-	PRIMARY KEY(id)
-)ENGINE=INNODB default charset utf8;
-
 -- 评论
 drop table if exists cp_comment;
 create table cp_comment(
@@ -77,3 +71,17 @@ create table cp_comment(
 	update_time datetime DEFAULT NULL COMMENT '更新时间',
 	PRIMARY KEY(id)
 )ENGINE=INNODB default charset utf8;
+
+-- 图片
+drop table if exists cp_picture;
+create table cp_picture(
+	id int AUTO_INCREMENT,
+	pic_name varchar(60) NOT NULL COMMENT '图片原名',
+	pic_path varchar(60) NOT NULL COMMENT '服务器存储目录',
+	pic_url varchar(80) NOT NULL DEFAULT '' COMMENT '文件url路径',
+	content_type varchar(60) COMMENT '文件类型',
+	userid int NOT NULL COMMENT '用户id',
+	create_time datetime NOT NULL COMMENT '记录时间',
+	update_time datetime DEFAULT NULL COMMENT '更新时间',
+	PRIMARY KEY(id)
+)default charset utf8;
