@@ -4,7 +4,14 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class Mem_map_example {
+/**
+ * 
+ * 利用MappedByteBuffer
+ * 
+ * @author zengxm 2015年3月30日
+ *
+ */
+public class MemMapExample {
 	static final int mem_map_size = 20 * 1024 * 1024;
 	static final String mem_file = "e://example_memory_mapped_file.txt";
 	static final String disk_file = "e://example_disk_mapped_file.txt";

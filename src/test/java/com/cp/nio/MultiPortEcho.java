@@ -40,7 +40,7 @@ public class MultiPortEcho {
 			ServerSocket ss = ssc.socket();
 			InetSocketAddress address = new InetSocketAddress(ports[i]);
 			ss.bind(address);
-
+			
 			SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
 
 			System.out.println("Going to listen on " + ports[i]);
