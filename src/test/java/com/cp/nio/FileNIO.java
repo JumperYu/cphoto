@@ -29,7 +29,7 @@ public class FileNIO {
 
 	private static final Charset CHARSET = Charset.forName("utf-8");
 
-	private static final String PATH = "d://pagefile.sys";
+	private static final String PATH = "d://test.txt";
 
 	private static int BYTES_SIZE = 1024 * 1000;
 
@@ -106,7 +106,7 @@ public class FileNIO {
 		try {
 			RandomAccessFile raf = new RandomAccessFile("d://test.txt", "rw");
 			FileChannel fc = raf.getChannel();
-			int size_Gb = 1024; // 生成1G的文件
+			int size_Gb = 6; // 生成1G的文件
 			for (int g = 0; g < size_Gb; g++) {
 				int size_Mb = 1024 * 1024;
 				ByteBuffer buffer = ByteBuffer.allocate(size_Mb);
@@ -123,7 +123,7 @@ public class FileNIO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}	
 
 	// 使用内存映射快速生成
 	@Test
