@@ -29,7 +29,7 @@ public class FileNIO {
 
 	private static final Charset CHARSET = Charset.forName("utf-8");
 
-	private static final String PATH = "d://test.txt";
+	private static final String PATH = "E://test.txt";
 
 	private static int BYTES_SIZE = 1024 * 1000;
 
@@ -104,7 +104,7 @@ public class FileNIO {
 	@Test
 	public void writeFileQuick() {
 		try {
-			RandomAccessFile raf = new RandomAccessFile("d://test.txt", "rw");
+			RandomAccessFile raf = new RandomAccessFile("E://大于5Mb的文件.txt", "rw");
 			FileChannel fc = raf.getChannel();
 			int size_Gb = 6; // 生成1G的文件
 			for (int g = 0; g < size_Gb; g++) {
